@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 
@@ -23,7 +21,7 @@ class ActionButton extends StatelessWidget {
           ],
         ),
         child: Text(contenidoBoton,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             )),

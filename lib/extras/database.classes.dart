@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -40,11 +43,18 @@ class DatabaseHelper {
   static const int _version = 1;
   static const String _dbName = 'appLab_database.db';
 
+  static void initializeDB() async {
+    var dbDir = await getDatabasesPath();
+    var dbPath = join(dbDir, "appLab_database.db");
+    await deleteDatabase(dbPath);
+    ByteData data = await rootBundle.load("assets/appLab_database.db");
+    List<int> bytes =
+        data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
+    await File(dbPath).writeAsBytes(bytes);
+  }
+
   static Future<Database> getDB() async {
     return openDatabase(join(await getDatabasesPath(), _dbName),
-        onCreate: (db, version) async => await db.execute(
-              'CREATE TABLE users(id INTEGER PRIMARY KEY, name TEXT, password TEXT, type INTEGER)',
-            ),
         version: _version);
   }
 
