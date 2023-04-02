@@ -12,11 +12,10 @@ class SplashView extends StatelessWidget {
     Timer(const Duration(seconds: 2), () => Get.to(LoginView()));
     return Scaffold(
       backgroundColor: GlobalColors.mainColor,
-      body: const Center(
-        child: Text(
-          'Control de Laboratorios',
-          style: TextStyle(
-              color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold),
+      body: Center(
+        child: Image.asset(
+          'assets/images/ipn_logo.png',
+          height: 350,
         ),
       ),
     );

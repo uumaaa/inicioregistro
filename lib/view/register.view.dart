@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
-import 'package:inicioregistro/view/register.view.dart';
 
-class LoginView extends StatelessWidget {
-  LoginView({super.key});
+class RegisterView extends StatelessWidget {
+  RegisterView({super.key});
   final TextEditingController controladorMatricula = TextEditingController();
   final TextEditingController controladorContrasena = TextEditingController();
 
@@ -22,7 +21,6 @@ class LoginView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 50),
               Container(
                 alignment: Alignment.center,
                 child: Image.asset(
@@ -30,12 +28,12 @@ class LoginView extends StatelessWidget {
                   height: 150,
                 ),
               ),
-              const SizedBox(height: 115),
+              const SizedBox(height: 10),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Inicia sesión',
+                    'Registrate',
                     style: TextStyle(
                         color: GlobalColors.mainColor,
                         fontWeight: FontWeight.bold),
@@ -57,7 +55,7 @@ class LoginView extends StatelessWidget {
                 obscureText: true,
               ),
               const SizedBox(height: 10),
-              ActionButton(
+              const ActionButton(
                 contenidoBoton: 'Iniciar sesión',
               )
             ],
@@ -71,7 +69,6 @@ class LoginView extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('¿No tienes cuenta?    '),
           InkWell(
-            onTap: () => Get.to(RegisterView()),
             child: Text('Regístrate',
                 style: TextStyle(color: GlobalColors.mainColor)),
           )
