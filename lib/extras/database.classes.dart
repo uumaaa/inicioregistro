@@ -1,18 +1,23 @@
-import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class User {
-  final int id;
-  final String name;
-  final String password;
-  final int type;
+  late final int id;
+  late final String name;
+  late final String password;
+  late final int type;
 
   User(
       {required this.id,
       required this.name,
       required this.password,
       required this.type});
+  User.fromMap(Map<String, dynamic> map) {
+    id = map['id'];
+    name = map['name'];
+    password = map['password'];
+    type = map['type'];
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -33,7 +38,7 @@ class User {
 
 class DatabaseHelper {
   static const int _version = 1;
-  static const String _dbName = "appLab_database.db";
+  static const String _dbName = 'appLab_database.db';
 
   static Future<Database> getDB() async {
     return openDatabase(join(await getDatabasesPath(), _dbName),
@@ -80,7 +85,7 @@ class DatabaseHelper {
       'users',
       user.toMap(),
       // Aseguúrate de que solo actualizarás el User con el id coincidente
-      where: "id = ?",
+      where: 'id = ?',
       // Pasa el id User a través de whereArg para prevenir SQL injection
       whereArgs: [user.id],
     );
@@ -93,9 +98,24 @@ class DatabaseHelper {
     await db.delete(
       'users',
       // Utiliza la cláusula `where` para eliminar un user específico
-      where: "id = ?",
+      where: 'id = ?',
       // Pasa el id User a través de whereArg para prevenir SQL injection
       whereArgs: [id],
     );
+  }
+
+  static Future<User> getUser(int id, String password) async {
+    // Obtiene una referencia de la base de datos
+    final db = await getDB();
+    // Obtiene una lista de listas sobre el resultado obtenido
+    final maps = await db.query(
+      'users',
+      where: 'id = ? AND password = ?',
+      whereArgs: [id, password],
+    );
+    if (maps.isEmpty) {
+      return User(id: -1, name: 'none', password: 'none', type: -1);
+    }
+    return User.fromMap(maps[0]);
   }
 }

@@ -88,10 +88,6 @@ class RegisterView extends StatelessWidget {
                       tipo.isEmpty) {
                     return;
                   }
-                  print(matricula);
-                  print(contrasena);
-                  print(nombre);
-                  print(tipo);
                   final user = User(
                       id: int.parse(matricula),
                       name: nombre,
@@ -100,6 +96,12 @@ class RegisterView extends StatelessWidget {
                   await DatabaseHelper.insertUser(user);
                 },
               ),
+              const SizedBox(height: 10),
+              ActionButton(
+                  contenidoBoton: 'mostrar base de datos',
+                  function: () async {
+                    print(await DatabaseHelper.users());
+                  }),
             ],
           ),
         ),
@@ -111,8 +113,8 @@ class RegisterView extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('¿Ya tienes cuenta?    '),
           InkWell(
-            onTap: () => Get.to(() => LoginView()),
-            child: Text('Imicia sesión',
+            onTap: () => Get.to(() => const LoginView()),
+            child: Text('Inicia sesión',
                 style: TextStyle(color: GlobalColors.mainColor)),
           )
         ]),

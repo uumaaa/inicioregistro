@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/view/splash.view.dart';
-//Base de datos
-import 'package:inicioregistro/extras/database.classes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
