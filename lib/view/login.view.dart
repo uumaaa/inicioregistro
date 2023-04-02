@@ -59,6 +59,7 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 10),
               ActionButton(
                 contenidoBoton: 'Iniciar sesión',
+                function: () => {},
               )
             ],
           ),
@@ -71,7 +72,7 @@ class LoginView extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('¿No tienes cuenta?    '),
           InkWell(
-            onTap: () => Get.to(RegisterView()),
+            onTap: () => Get.to(() => const RegisterView()),
             child: Text('Regístrate',
                 style: TextStyle(color: GlobalColors.mainColor)),
           )
