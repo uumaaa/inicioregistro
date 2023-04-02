@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
+import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
+import '../extras/database.classes.dart';
 
 class RegisterView extends StatelessWidget {
-  RegisterView({super.key});
-  final TextEditingController controladorMatricula = TextEditingController();
-  final TextEditingController controladorContrasena = TextEditingController();
+  const RegisterView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TextEditingController controladorMatricula = TextEditingController();
+    final TextEditingController controladorContrasena = TextEditingController();
+    final TextEditingController controladorNombre = TextEditingController();
+    final TextEditingController controladorTipo = TextEditingController();
     return Scaffold(
       backgroundColor: GlobalColors.colorFondo,
       body: SingleChildScrollView(
@@ -49,15 +53,53 @@ class RegisterView extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               TextFormGlobal(
+                controller: controladorNombre,
+                textInputType: TextInputType.text,
+                textHint: 'Nombre',
+                obscureText: false,
+              ),
+              const SizedBox(height: 10),
+              TextFormGlobal(
                 controller: controladorContrasena,
                 textInputType: TextInputType.text,
                 textHint: 'Contraseña',
                 obscureText: true,
               ),
               const SizedBox(height: 10),
-              const ActionButton(
-                contenidoBoton: 'Iniciar sesión',
-              )
+              TextFormGlobal(
+                controller: controladorTipo,
+                textInputType: TextInputType.text,
+                textHint: 'Tipo',
+                obscureText: false,
+              ),
+              const SizedBox(height: 10),
+              ActionButton(
+                contenidoBoton: 'Registrate',
+                function: () async {
+                  final matricula = controladorMatricula.value.text;
+                  final contrasena = controladorContrasena.value.text;
+                  final nombre = controladorNombre.value.text;
+                  final tipo = controladorTipo.value.text;
+                  if (matricula.isEmpty ||
+                      contrasena.isEmpty ||
+                      nombre.isEmpty ||
+                      tipo.isEmpty) {
+                    return;
+                  }
+                  final user = User(
+                      id: int.parse(matricula),
+                      name: nombre,
+                      password: contrasena,
+                      type: int.parse(tipo));
+                  await DatabaseHelper.insertUser(user);
+                },
+              ),
+              const SizedBox(height: 10),
+              ActionButton(
+                  contenidoBoton: 'mostrar base de datos',
+                  function: () async {
+                    print(await DatabaseHelper.users());
+                  }),
             ],
           ),
         ),
@@ -67,9 +109,10 @@ class RegisterView extends StatelessWidget {
         color: GlobalColors.colorFondo,
         alignment: Alignment.center,
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text('¿No tienes cuenta?    '),
+          const Text('¿Ya tienes cuenta?    '),
           InkWell(
-            child: Text('Regístrate',
+            onTap: () => Get.to(() => const LoginView()),
+            child: Text('Inicia sesión',
                 style: TextStyle(color: GlobalColors.mainColor)),
           )
         ]),

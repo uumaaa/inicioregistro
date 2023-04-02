@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 
 class ActionButton extends StatelessWidget {
-  const ActionButton({super.key, required this.contenidoBoton});
+  const ActionButton(
+      {super.key, required this.contenidoBoton, required this.function});
   final String contenidoBoton;
+  final void Function() function;
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => print('apcoo'),
+      onTap: function,
       child: Container(
         alignment: Alignment.center,
         height: 55,
@@ -19,7 +21,7 @@ class ActionButton extends StatelessWidget {
           ],
         ),
         child: Text(contenidoBoton,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
             )),

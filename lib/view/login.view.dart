@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inicioregistro/extras/database.classes.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/register.view.dart';
 
 class LoginView extends StatelessWidget {
-  LoginView({super.key});
-  final TextEditingController controladorMatricula = TextEditingController();
-  final TextEditingController controladorContrasena = TextEditingController();
-
+  const LoginView({super.key});
   @override
   Widget build(BuildContext context) {
+    final TextEditingController controladorMatricula = TextEditingController();
+    final TextEditingController controladorContrasena = TextEditingController();
     return Scaffold(
       backgroundColor: GlobalColors.colorFondo,
       body: SingleChildScrollView(
@@ -59,7 +59,28 @@ class LoginView extends StatelessWidget {
               const SizedBox(height: 10),
               ActionButton(
                 contenidoBoton: 'Iniciar sesión',
-              )
+                function: () async {
+                  final matricula = controladorMatricula.value.text;
+                  final contrasena = controladorContrasena.value.text;
+                  if (matricula.isEmpty || contrasena.isEmpty) {
+                    return;
+                  }
+
+                  final posibleUser = await DatabaseHelper.getUser(
+                      int.parse(matricula), contrasena);
+                  if (posibleUser.id == -1) {
+                    print('Usuario y/o contraseña incorrecto');
+                    return;
+                  }
+                  print('Inicio de sesión correcto');
+                },
+              ),
+              const SizedBox(height: 10),
+              ActionButton(
+                  contenidoBoton: 'mostrar base de datos',
+                  function: () async {
+                    print(await DatabaseHelper.users());
+                  }),
             ],
           ),
         ),
@@ -71,7 +92,7 @@ class LoginView extends StatelessWidget {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Text('¿No tienes cuenta?    '),
           InkWell(
-            onTap: () => Get.to(RegisterView()),
+            onTap: () => Get.to(() => const RegisterView()),
             child: Text('Regístrate',
                 style: TextStyle(color: GlobalColors.mainColor)),
           )
