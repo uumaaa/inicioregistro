@@ -42,7 +42,6 @@ class User {
 class DatabaseHelper {
   static const int _version = 1;
   static const String _dbName = 'appLab_database.db';
-
   static void initializeDB() async {
     var dbDir = await getDatabasesPath();
     var dbPath = join(dbDir, "appLab_database.db");
