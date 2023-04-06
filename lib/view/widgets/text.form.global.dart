@@ -14,40 +14,58 @@ class TextFormGlobal extends StatelessWidget {
   final bool obscureText;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 50,
-      decoration: BoxDecoration(
-        color: GlobalColors.colorFondo,
-        borderRadius: BorderRadius.circular(50),
-      ),
-      child: TextFormField(
-        controller: controller,
-        cursorColor: GlobalColors.mainColor,
-        keyboardType: textInputType,
-        obscureText: obscureText,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          height: 1,
-          fontWeight: FontWeight.bold,
-          color: GlobalColors.mainColor,
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(width: 30),
+            Text(
+              textHint,
+              style: TextStyle(
+                  fontSize: 14,
+                  height: 1,
+                  color: GlobalColors.mainColor,
+                  fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        decoration: InputDecoration(
-            hintText: textHint,
-            enabledBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: GlobalColors.mainColor, width: 2.5),
-                borderRadius: BorderRadius.circular(50)),
-            focusedBorder: OutlineInputBorder(
-                borderSide:
-                    BorderSide(color: GlobalColors.mainColor, width: 2.5),
-                borderRadius: BorderRadius.circular(50)),
-            contentPadding: const EdgeInsets.all(0),
-            hintStyle: TextStyle(
-              height: 1,
-              fontWeight: FontWeight.bold,
-              color: GlobalColors.mainColor,
-            )),
-      ),
+        Center(
+          child: Container(
+            width: 300,
+            height: 35,
+            decoration: BoxDecoration(
+              color: GlobalColors.colorFondo,
+            ),
+            child: TextFormField(
+              controller: controller,
+              cursorColor: GlobalColors.colorFondo,
+              keyboardType: textInputType,
+              obscureText: obscureText,
+              textAlign: TextAlign.start,
+              style: TextStyle(
+                height: 1,
+                fontWeight: FontWeight.bold,
+                color: GlobalColors.colorText,
+              ),
+              decoration: InputDecoration(
+                  hintText: textHint,
+                  enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: GlobalColors.colorSombreado, width: 1.5)),
+                  focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(
+                          color: GlobalColors.colorSombreado, width: 1.5)),
+                  hintStyle: TextStyle(
+                    height: 1,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: GlobalColors.colorSombreado,
+                  )),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

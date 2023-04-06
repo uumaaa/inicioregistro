@@ -8,24 +8,32 @@ class ActionButton extends StatelessWidget {
   final void Function() function;
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: function,
-      child: Container(
-        alignment: Alignment.center,
-        height: 55,
-        decoration: BoxDecoration(
-          color: GlobalColors.mainColor,
-          borderRadius: BorderRadius.circular(6),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10)
-          ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        InkWell(
+          onTap: function,
+          child: Container(
+            alignment: Alignment.center,
+            height: 45,
+            width: 300,
+            decoration: BoxDecoration(
+              color: GlobalColors.mainColor,
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                    color: GlobalColors.mainColor.withOpacity(0.34),
+                    blurRadius: 35)
+              ],
+            ),
+            child: Text(contenidoBoton,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
         ),
-        child: Text(contenidoBoton,
-            style: const TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-            )),
-      ),
+      ],
     );
   }
 }
