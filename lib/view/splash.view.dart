@@ -9,12 +9,12 @@ class SplashView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Timer(const Duration(seconds: 2), () => Get.to(() => const RegisterView()));
+    Timer(const Duration(seconds: 3), () => Get.to(() => const RegisterView()));
     return Scaffold(
       backgroundColor: GlobalColors.mainColor,
       body: Center(
         child: Image.asset(
-          'assets/images/ipn_logo.png',
+          'assets/images/logo_ipn_white.png',
           height: 350,
         ),
       ),

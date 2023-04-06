@@ -1,20 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
-import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import '../extras/database.classes.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class RegisterView extends StatelessWidget {
+class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
 
+  @override
+  State<RegisterView> createState() => _RegisterViewState();
+}
+
+class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     final TextEditingController controladorMatricula = TextEditingController();
     final TextEditingController controladorContrasena = TextEditingController();
     final TextEditingController controladorNombre = TextEditingController();
     final TextEditingController controladorTipo = TextEditingController();
+    bool isChecked = true;
+    Color getColor(Set<MaterialState> states) {
+      const Set<MaterialState> interactiveStates = <MaterialState>{
+        MaterialState.pressed,
+        MaterialState.hovered,
+        MaterialState.focused,
+      };
+      if (states.any(interactiveStates.contains)) {
+        return GlobalColors.mainColor;
+      }
+      return GlobalColors.mainColor;
+    }
+
     return Scaffold(
       backgroundColor: GlobalColors.colorFondo,
       body: SingleChildScrollView(
@@ -25,10 +42,11 @@ class RegisterView extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              const SizedBox(height: 10),
               Container(
                 alignment: Alignment.center,
                 child: Image.asset(
-                  'assets/images/logo_ipn.webp',
+                  'assets/images/logo_ipn_red.webp',
                   height: 150,
                 ),
               ),
@@ -36,43 +54,125 @@ class RegisterView extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Registrate',
-                    style: TextStyle(
-                        color: GlobalColors.mainColor,
-                        fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 30),
+                      Text(
+                        'Registro',
+                        style: TextStyle(
+                            color: GlobalColors.mainColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 28),
+                      ),
+                    ],
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 30),
               TextFormGlobal(
                 controller: controladorMatricula,
                 textInputType: TextInputType.number,
                 textHint: 'Matrícula',
                 obscureText: false,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               TextFormGlobal(
                 controller: controladorNombre,
                 textInputType: TextInputType.text,
                 textHint: 'Nombre',
                 obscureText: false,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               TextFormGlobal(
                 controller: controladorContrasena,
                 textInputType: TextInputType.text,
                 textHint: 'Contraseña',
                 obscureText: true,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 15),
               TextFormGlobal(
                 controller: controladorTipo,
                 textInputType: TextInputType.text,
                 textHint: 'Tipo',
                 obscureText: false,
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 30),
+              Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(
+                        width: 30,
+                      ),
+                      SizedBox(
+                        height: 16,
+                        width: 16,
+                        child: StatefulBuilder(
+                          builder: (context, setState) {
+                            return Checkbox(
+                              checkColor: Colors.white,
+                              fillColor:
+                                  MaterialStateProperty.resolveWith(getColor),
+                              value: isChecked,
+                              onChanged: (bool? value) => {
+                                setState(() {
+                                  isChecked = value!;
+                                })
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      Text(
+                        'Acepto el ',
+                        style: TextStyle(
+                          color: GlobalColors.colorSombreadoOscuro,
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () async {
+                          const url = 'https://linktr.ee/laboratorios.upiit';
+                          final uri = Uri.parse(url);
+                          if (await canLaunchUrl(uri)) {
+                            await launchUrl(uri);
+                          } else {
+                            throw 'Could not launch $url';
+                          }
+                        },
+                        child: Text('reglamento del laboratorio',
+                            style: TextStyle(
+                              color: GlobalColors.mainColor,
+                              fontWeight: FontWeight.bold,
+                            )),
+                      ),
+                      Text(
+                        ' y me',
+                        style: TextStyle(
+                          color: GlobalColors.colorSombreadoOscuro,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(width: 56),
+                      Text(
+                        'atendo a las consecuencias por\nincumplirlo',
+                        style: TextStyle(
+                          color: GlobalColors.colorSombreadoOscuro,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 30),
               ActionButton(
                 contenidoBoton: 'Registrate',
                 function: () async {
@@ -94,29 +194,27 @@ class RegisterView extends StatelessWidget {
                   await DatabaseHelper.insertUser(user);
                 },
               ),
-              const SizedBox(height: 10),
-              ActionButton(
-                  contenidoBoton: 'mostrar base de datos',
-                  function: () async {
-                    print(await DatabaseHelper.users());
-                  }),
+              const SizedBox(height: 20),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Text(
+                  '¿Ya tienes cuenta?  ',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: GlobalColors.colorSombreadoOscuro),
+                ),
+                InkWell(
+                  onTap: () => {},
+                  child: Text('Ingresa',
+                      style: TextStyle(
+                        color: GlobalColors.mainColor,
+                        fontWeight: FontWeight.bold,
+                      )),
+                ),
+              ]),
             ],
           ),
         ),
       )),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: GlobalColors.colorFondo,
-        alignment: Alignment.center,
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Text('¿Ya tienes cuenta?    '),
-          InkWell(
-            onTap: () => Get.to(() => const LoginView()),
-            child: Text('Inicia sesión',
-                style: TextStyle(color: GlobalColors.mainColor)),
-          )
-        ]),
-      ),
     );
   }
 }
