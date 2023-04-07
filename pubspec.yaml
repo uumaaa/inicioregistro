@@ -41,6 +41,7 @@ dependencies:
   path_provider:
   flutter_pdfview: ^1.2.7
   url_launcher:
+  rive: ^0.10.3
 
 dev_dependencies:
   flutter_test:
