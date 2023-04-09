@@ -20,6 +20,7 @@ class InfoCard extends StatelessWidget {
       title: Text(
         nombre,
         style: TextStyle(
+          fontSize: 18,
           color: GlobalColors.colorText,
           fontWeight: FontWeight.bold,
         ),
