@@ -5,14 +5,14 @@ import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/widgets/info.card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class BarraNavegacion extends StatefulWidget {
-  const BarraNavegacion({super.key});
+class SideBarMenuView extends StatefulWidget {
+  const SideBarMenuView({super.key});
 
   @override
-  State<BarraNavegacion> createState() => _BarraNavegacionState();
+  State<SideBarMenuView> createState() => _SideBarMenuViewState();
 }
 
-class _BarraNavegacionState extends State<BarraNavegacion> {
+class _SideBarMenuViewState extends State<SideBarMenuView> {
   String nombre = 'Iker Antonio Pluma Amaro';
   int id = 2022710222;
   @override

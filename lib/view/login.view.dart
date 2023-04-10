@@ -6,6 +6,7 @@ import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/register.view.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -13,34 +14,40 @@ class LoginView extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController controladorMatricula = TextEditingController();
     final TextEditingController controladorContrasena = TextEditingController();
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: GlobalColors.mainColor,
-      ),
-      drawer: const BarraNavegacion(),
-      backgroundColor: GlobalColors.colorFondo,
-      body: LoginPrincipal(controladorMatricula, controladorContrasena),
-      bottomNavigationBar: Container(
-        height: 50,
-        color: GlobalColors.colorFondo,
-        alignment: Alignment.topRight,
-        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-          InkWell(
-            onTap: () => Get.to(() => const RegisterView()),
-            child: Text('Crea una cuenta',
-                style: TextStyle(
-                    color: GlobalColors.mainColor,
-                    fontWeight: FontWeight.bold)),
-          ),
-          const SizedBox(
-            width: 50,
-          ),
-        ]),
+    return KeyboardDismisser(
+      gestures: const [
+        GestureType.onTap,
+        GestureType.onVerticalDragDown,
+      ],
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: GlobalColors.mainColor,
+        ),
+        drawer: const SideBarMenuView(),
+        backgroundColor: GlobalColors.colorFondo,
+        body: loginPrincipal(controladorMatricula, controladorContrasena),
+        bottomNavigationBar: Container(
+          height: 50,
+          color: GlobalColors.colorFondo,
+          alignment: Alignment.topRight,
+          child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            InkWell(
+              onTap: () => Get.to(() => const RegisterView()),
+              child: Text('Crea una cuenta',
+                  style: TextStyle(
+                      color: GlobalColors.mainColor,
+                      fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(
+              width: 50,
+            ),
+          ]),
+        ),
       ),
     );
   }
 
-  SingleChildScrollView LoginPrincipal(
+  SingleChildScrollView loginPrincipal(
       TextEditingController controladorMatricula,
       TextEditingController controladorContrasena) {
     return SingleChildScrollView(

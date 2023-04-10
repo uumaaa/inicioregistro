@@ -134,7 +134,6 @@ class _BookingViewState extends State<BookingView> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    DropdownButton(items: items, onChanged: onChanged)
                   ],
                 ),
               ],

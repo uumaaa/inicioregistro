@@ -3,9 +3,9 @@ import 'package:get/get.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
-import 'package:inicioregistro/view/widgets/menu.button.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
+import 'package:keyboard_dismisser/keyboard_dismisser.dart';
 import '../extras/database.classes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -38,8 +38,14 @@ class _RegisterViewState extends State<RegisterView>
       return GlobalColors.mainColor;
     }
 
-    return registerPrincipal(controladorMatricula, controladorNombre,
-        controladorContrasena, controladorTipo, getColor);
+    return KeyboardDismisser(
+      gestures: const [
+        GestureType.onTap,
+        GestureType.onVerticalDragDown,
+      ],
+      child: registerPrincipal(controladorMatricula, controladorNombre,
+          controladorContrasena, controladorTipo, getColor),
+    );
   }
 
   Scaffold registerPrincipal(
@@ -50,7 +56,7 @@ class _RegisterViewState extends State<RegisterView>
       Color getColor(Set<MaterialState> states)) {
     return Scaffold(
       appBar: AppBar(backgroundColor: GlobalColors.mainColor),
-      drawer: const BarraNavegacion(),
+      drawer: const SideBarMenuView(),
       body: SingleChildScrollView(
           child: SafeArea(
         child: Container(

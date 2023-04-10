@@ -41,6 +41,8 @@ dependencies:
   path_provider:
   flutter_pdfview: ^1.2.7
   url_launcher:
+  intl: ^0.16.1
+  keyboard_dismisser: ^3.0.0
 
 dev_dependencies:
   flutter_test:
