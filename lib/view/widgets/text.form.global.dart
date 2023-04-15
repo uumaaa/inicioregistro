@@ -68,42 +68,43 @@ class _TextFormGlobalState extends State<TextFormGlobal> {
                   color: GlobalColors.colorText,
                 ),
                 decoration: InputDecoration(
-                    suffixIcon: widget.controller.text.isEmpty
-                        ? Container(
-                            width: 0,
-                          )
-                        : widget.obscureText
-                            ? IconButton(
-                                icon: Icon(
-                                  isPasswordVisible
-                                      ? CupertinoIcons.eye_slash
-                                      : CupertinoIcons.eye,
-                                  size: 15,
-                                ),
-                                color: GlobalColors.mainColor,
-                                onPressed: () {
-                                  setState(() {
-                                    isPasswordVisible = !isPasswordVisible;
-                                  });
-                                },
-                              )
-                            : IconButton(
-                                icon: const Icon(
-                                  CupertinoIcons.xmark,
-                                  size: 15,
-                                ),
-                                color: GlobalColors.mainColor,
-                                onPressed: () {
-                                  widget.controller.clear();
-                                },
+                  suffixIcon: widget.controller.text.isEmpty
+                      ? Container(
+                          width: 0,
+                        )
+                      : widget.obscureText
+                          ? IconButton(
+                              icon: Icon(
+                                isPasswordVisible
+                                    ? CupertinoIcons.eye_slash
+                                    : CupertinoIcons.eye,
+                                size: 15,
                               ),
-                    hintText: widget.textHint,
-                    hintStyle: TextStyle(
-                      height: 1,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: GlobalColors.colorSombreado,
-                    )),
+                              color: GlobalColors.mainColor,
+                              onPressed: () {
+                                setState(() {
+                                  isPasswordVisible = !isPasswordVisible;
+                                });
+                              },
+                            )
+                          : IconButton(
+                              icon: const Icon(
+                                CupertinoIcons.xmark,
+                                size: 15,
+                              ),
+                              color: GlobalColors.mainColor,
+                              onPressed: () {
+                                widget.controller.clear();
+                              },
+                            ),
+                  hintText: widget.textHint,
+                  hintStyle: TextStyle(
+                    height: 1,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: GlobalColors.colorSombreado,
+                  ),
+                ),
               ),
             ),
           ),

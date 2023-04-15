@@ -23,13 +23,59 @@ class ActionButton extends StatelessWidget {
               boxShadow: [
                 BoxShadow(
                     color: GlobalColors.mainColor.withOpacity(0.34),
-                    blurRadius: 35)
+                    blurRadius: 10)
               ],
             ),
             child: Text(contenidoBoton,
                 style: const TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
+                )),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class ActionButtonSized extends StatelessWidget {
+  const ActionButtonSized(
+      {super.key,
+      required this.contenidoBoton,
+      required this.function,
+      required this.width,
+      required this.height,
+      required this.fontSize});
+  final String contenidoBoton;
+  final void Function() function;
+  final double width;
+  final double height;
+  final double fontSize;
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        InkWell(
+          onTap: function,
+          child: Container(
+            alignment: Alignment.center,
+            height: height,
+            width: width,
+            decoration: BoxDecoration(
+              color: GlobalColors.mainColor,
+              borderRadius: BorderRadius.circular(6),
+              boxShadow: [
+                BoxShadow(
+                    color: GlobalColors.mainColor.withOpacity(0.34),
+                    blurRadius: 0)
+              ],
+            ),
+            child: Text(contenidoBoton,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: fontSize,
                 )),
           ),
         ),
