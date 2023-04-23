@@ -10,15 +10,15 @@ import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/widgets/computer.dart';
 import 'package:inicioregistro/view/widgets/drop.down.menu.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
-import 'package:sqflite/sqflite.dart';
 
-class BookingView extends StatefulWidget {
-  const BookingView({super.key});
+class RegisteredBooking extends StatefulWidget {
+  const RegisteredBooking({super.key});
+
   @override
-  State<BookingView> createState() => _BookingViewState();
+  State<RegisteredBooking> createState() => _RegisteredBookingState();
 }
 
-class _BookingViewState extends State<BookingView> {
+class _RegisteredBookingState extends State<RegisteredBooking> {
   final TextEditingController _controllerDate = TextEditingController();
   late String selectedLab;
   late String selectedInHour;
@@ -44,7 +44,7 @@ class _BookingViewState extends State<BookingView> {
             startHours.add(module.startHour);
             finalHours.add(module.finalHour);
           }
-          return bookingObs(
+          return registeredbookingObs(
               context, currentDate, startHours, finalHours, computers);
         } else {
           return Scaffold(
@@ -61,7 +61,7 @@ class _BookingViewState extends State<BookingView> {
     );
   }
 
-  KeyboardDismisser bookingObs(
+  KeyboardDismisser registeredbookingObs(
       BuildContext context,
       DateTime currentDate,
       List<String> startHours,
@@ -88,7 +88,7 @@ class _BookingViewState extends State<BookingView> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      'Reservación',
+                      'Horarios',
                       style: TextStyle(
                         color: GlobalColors.mainColor,
                         fontSize: 35,
@@ -209,177 +209,6 @@ class _BookingViewState extends State<BookingView> {
                 ),
                 const SizedBox(
                   height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Hora de inicio',
-                          style: TextStyle(
-                            color: GlobalColors.mainColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 50,
-                          width: 150,
-                          child: Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: ThemeData().colorScheme.copyWith(
-                                      primary: GlobalColors.mainColor,
-                                    ),
-                              ),
-                              child: DropdownMenuAlter(
-                                listOfItems: startHours,
-                              )),
-                        )
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 50,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Hora de fin',
-                          style: TextStyle(
-                            color: GlobalColors.mainColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 50,
-                          width: 150,
-                          child: Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: ThemeData().colorScheme.copyWith(
-                                      primary: GlobalColors.mainColor,
-                                    ),
-                              ),
-                              child: DropdownMenuAlter(
-                                listOfItems: finalHours,
-                              )),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 10,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    Text(
-                      'Datos de registro',
-                      style: TextStyle(
-                        color: GlobalColors.mainColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(
-                      width: 30,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Identificador',
-                          style: TextStyle(
-                            color: GlobalColors.mainColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(id.toString())
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 50,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Ocupacion',
-                          style: TextStyle(
-                            color: GlobalColors.mainColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(type.toString()),
-                      ],
-                    ),
-                    const SizedBox(
-                      width: 30,
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 60,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 8,
-                            childAspectRatio: 1.3,
-                            mainAxisExtent: 75),
-                    itemCount: computers.length,
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) => ComputerInput(
-                        computerNumber: computers[index].idComputer + 1,
-                        isNotEnabled: false),
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: const [
-                    ComputerInputNoFunction(color: 1, text: "Seleccionada(s)"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    ComputerInputNoFunction(color: 2, text: "Disponibles(s)"),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    ComputerInputNoFunction(color: 3, text: "Reservada(s)"),
-                    SizedBox(
-                      width: 10,
-                    )
-                  ],
-                ),
-                SizedBox(
-                  height: 60,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ActionButtonSized(
-                      contenidoBoton: 'Hacer reservación',
-                      function: () => Get.to(() => const CreateBooking()),
-                      width: 130,
-                      height: 35,
-                      fontSize: 12,
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                  ],
                 ),
               ],
             ),
