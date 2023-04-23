@@ -4,7 +4,8 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/extras/database.classes.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
-import 'package:inicioregistro/view/create.booking.dart';
+
+import 'package:inicioregistro/view/register.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/widgets/computer.dart';
@@ -329,15 +330,19 @@ class _BookingViewState extends State<BookingView> {
                   ],
                 ),
                 const SizedBox(
-                  height: 60,
+                  height: 40,
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                Container(
+                  decoration:
+                      BoxDecoration(border: Border.all(color: Colors.black)),
+                  margin: EdgeInsets.all(10),
+                  padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
                   child: GridView.builder(
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 8,
                             childAspectRatio: 1.3,
+                            crossAxisSpacing: 5,
                             mainAxisExtent: 75),
                     itemCount: computers.length,
                     shrinkWrap: true,
@@ -363,16 +368,16 @@ class _BookingViewState extends State<BookingView> {
                     )
                   ],
                 ),
-                SizedBox(
-                  height: 60,
+                const SizedBox(
+                  height: 30,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ActionButtonSized(
-                      contenidoBoton: 'Hacer reservación',
-                      function: () => Get.to(() => const CreateBooking()),
-                      width: 130,
+                      contenidoBoton: 'Confirmar reservación',
+                      function: () => Get.to(() => const RegisterView()),
+                      width: 150,
                       height: 35,
                       fontSize: 12,
                     ),

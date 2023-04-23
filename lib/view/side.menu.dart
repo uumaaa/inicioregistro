@@ -5,7 +5,7 @@ import 'package:inicioregistro/view/bookings.view.dart';
 import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/register.view.dart';
 import 'package:inicioregistro/view/widgets/info.card.dart';
-import 'package:inicioregistro/view/widgets/registered.booking.dart';
+import 'package:inicioregistro/view/registered.booking.view.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SideBarMenuView extends StatefulWidget {

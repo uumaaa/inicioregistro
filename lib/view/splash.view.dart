@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/bookings.view.dart';
-import 'package:inicioregistro/view/widgets/registered.booking.dart';
+import 'package:inicioregistro/view/registered.booking.view.dart';
 
 class SplashView extends StatelessWidget {
   const SplashView({super.key});

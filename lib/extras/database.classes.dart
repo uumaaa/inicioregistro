@@ -423,7 +423,7 @@ class DatabaseHelper {
     );
   }
 
-  static Future<List<Reservation>> reservation() async {
+  static Future<List<Reservation>> reservations() async {
     final Database db = await getDB();
     final List<Map<String, dynamic>> maps = await db.query('reservations');
 
