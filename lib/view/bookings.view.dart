@@ -29,7 +29,7 @@ class _BookingViewState extends State<BookingView> {
   late Future<List<List<dynamic>>> futureComputers;
   late Future futureModulesComputers;
   late bool allComputers;
-  late List<bool> selectedComputers;
+  late List<int> selectedComputers;
   @override
   void initState() {
     currentDate = DateTime(now.year, now.month, now.day);
@@ -54,6 +54,7 @@ class _BookingViewState extends State<BookingView> {
 
   void refreshData() {
     setState(() {
+      selectedComputers = [];
       futureComputers = Future.wait(
         [
           DatabaseHelper.getComputersBetweenModules(selectedInHour,
@@ -352,8 +353,13 @@ class _BookingViewState extends State<BookingView> {
                               itemCount: computers.length,
                               shrinkWrap: true,
                               itemBuilder: (context, index) => ComputerInput(
-                                  selectedReturnValue: (p0) {},
-                                  initialState: allComputers,
+                                  selectedReturnValue: (p0) {
+                                    if (selectedComputers.contains(p0)) {
+                                      selectedComputers.remove(p0);
+                                    } else {
+                                      selectedComputers.add(p0);
+                                    }
+                                  },
                                   computerNumber:
                                       computers[index].idComputer + 1,
                                   isNotEnabled: snapshot.data![0]
@@ -378,6 +384,7 @@ class _BookingViewState extends State<BookingView> {
                           setState(() {
                             allComputers = item!;
                           });
+                          refreshData();
                         }),
                     const SizedBox(
                       width: 10,
@@ -409,7 +416,9 @@ class _BookingViewState extends State<BookingView> {
                       isEnable: !(selectedDate.isBefore(currentDate) ||
                           selectedDate.isAtSameMomentAs(now)),
                       contenidoBoton: 'Confirmar reservación',
-                      function: () {},
+                      function: () {
+                        print(selectedComputers);
+                      },
                       width: 150,
                       height: 35,
                       fontSize: 12,

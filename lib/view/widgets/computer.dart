@@ -10,24 +10,16 @@ class ComputerInput extends StatefulWidget {
     required this.computerNumber,
     required this.isNotEnabled,
     required this.selectedReturnValue,
-    required this.initialState,
   });
-  final bool initialState;
   final int computerNumber;
   final bool isNotEnabled;
-  final Function(bool) selectedReturnValue;
+  final Function(int) selectedReturnValue;
   @override
   State<ComputerInput> createState() => _ComputerInputState();
 }
 
 class _ComputerInputState extends State<ComputerInput> {
-  late bool isSelected;
-  @override
-  void initState() {
-    isSelected = widget.initialState;
-    super.initState();
-  }
-
+  bool isSelected = false;
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -42,7 +34,7 @@ class _ComputerInputState extends State<ComputerInput> {
                     setState(() {
                       isSelected = !isSelected;
                     });
-                    widget.selectedReturnValue(isSelected);
+                    widget.selectedReturnValue(widget.computerNumber);
                   },
             alignment: Alignment.center,
             disabledColor: const Color.fromARGB(255, 204, 204, 204),
