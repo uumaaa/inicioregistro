@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
@@ -111,21 +112,29 @@ class Computer {
 
   @override
   String toString() {
-    return 'Lab{idComputer: $idComputer}';
+    return 'Computadora{idComputer: $idComputer}';
   }
+
+  @override
+  bool operator ==(Object other) =>
+      other is Computer && other.idComputer == idComputer;
 }
 
 class Reservation {
   late final int idReservation;
   late final int idUsuario;
-  late final int idModulo;
-  late final String reservationType;
+  late final int idModuloS;
+  late final int idModuloE;
+  late final int idLab;
+  late final int reservationType;
   late final int idComputer;
 
   Reservation({
     required this.idReservation,
     required this.idUsuario,
-    required this.idModulo,
+    required this.idModuloE,
+    required this.idModuloS,
+    required this.idLab,
     required this.reservationType,
     required this.idComputer,
   });
@@ -133,7 +142,9 @@ class Reservation {
   Reservation.fromMap(Map<String, dynamic> map) {
     idReservation = map['idReservation'];
     idUsuario = map['idUsuario'];
-    idModulo = map['idModulo'];
+    idModuloS = map['idModuloS'];
+    idModuloE = map['idModuloE'];
+    idLab = map['idLab'];
     reservationType = map['reservationType'];
     idComputer = map['idComputer'];
   }
@@ -142,7 +153,9 @@ class Reservation {
     return {
       'idReservation': idReservation,
       'idUsuario': idUsuario,
-      'idModulo': idModulo,
+      'idModuloS': idModuloS,
+      'idModuloE': idModuloE,
+      'idLab': idLab,
       'reservationType': reservationType,
       'idComputer': idComputer,
     };
@@ -150,7 +163,7 @@ class Reservation {
 
   @override
   String toString() {
-    return 'Reservation{idReservation: $idReservation, idUsuario: $idUsuario, idModulo: $idModulo, reservationType: $reservationType, idComputadora: $idComputer}';
+    return 'Reservation{idReservation: $idReservation, idUsuario: $idUsuario, idModuloS: $idModuloS, idModuloE: $idModuloE, idLab: $idLab reservationType: $reservationType, idComputadora: $idComputer}';
   }
 }
 
@@ -368,9 +381,10 @@ class DatabaseHelper {
     );
   }
 
-  static Future<List<Computer>> computers() async {
+  static Future<List<Computer>> computers(int lab) async {
     final Database db = await getDB();
-    final List<Map<String, dynamic>> maps = await db.query('computers');
+    final List<Map<String, dynamic>> maps = await db
+        .query('computers', where: 'idLaboratorio = ?', whereArgs: [lab]);
 
     return List.generate(maps.length, (i) {
       return Computer(
@@ -426,16 +440,58 @@ class DatabaseHelper {
   static Future<List<Reservation>> reservations() async {
     final Database db = await getDB();
     final List<Map<String, dynamic>> maps = await db.query('reservations');
-
     return List.generate(maps.length, (i) {
       return Reservation(
-        idReservation: maps[i]['idReservation'],
-        idUsuario: maps[i]['idUsuario'],
-        idModulo: maps[i]['idModulo'],
-        reservationType: maps[i]['reservationType'],
-        idComputer: maps[i]['idComputer'],
-      );
+          idReservation: maps[i]['idReservation'],
+          idUsuario: maps[i]['idUsuario'],
+          idModuloE: maps[i]['idModuloE'],
+          reservationType: maps[i]['reservationType'],
+          idComputer: maps[i]['idComputer'],
+          idModuloS: maps[i]['idModuloS'],
+          idLab: maps[i]['idLab']);
     });
+  }
+
+  static Future<List<Computer>> getComputersBetweenModules(
+      int startModule, int endModule, String date, int lab) async {
+    final Database db = await getDB();
+    final List<Map<String, dynamic>> maps = await db.query('reservations',
+        where:
+            '((idModuloS <= ? AND idModuloE >= ?) OR (idModuloS >= ? AND idModuloE >= ? AND idModuloS <= ?) OR (idModuloS <= ? AND idModuloE <= ? AND idModuloE >= ?)  OR (idModuloS >= ? AND idModuloE <= ?)) AND date = ? AND idLab = ?',
+        whereArgs: [
+          startModule,
+          endModule,
+          startModule,
+          endModule,
+          endModule,
+          startModule,
+          endModule,
+          startModule,
+          startModule,
+          endModule,
+          date,
+          lab
+        ]);
+    var listOfReservation = List.generate(
+        maps.length,
+        (i) => Reservation(
+            idReservation: maps[i]['idReservation'],
+            idUsuario: maps[i]['idUsuario'],
+            idModuloE: maps[i]['idModuloE'],
+            reservationType: maps[i]['reservationType'],
+            idComputer: maps[i]['idComputer'],
+            idModuloS: maps[i]['idModuloS'],
+            idLab: maps[i]['idLab']));
+    List<Computer> computersUsed = [];
+    List<Computer> allComputers = await computers(lab);
+    for (var reservation in listOfReservation) {
+      if (reservation.reservationType == 2) {
+        return allComputers;
+      } else {
+        computersUsed.add(Computer(idComputer: reservation.idComputer));
+      }
+    }
+    return computersUsed;
   }
 
   static Future<void> updateReservation(Reservation reservation) async {
@@ -464,15 +520,17 @@ class DatabaseHelper {
 
     final maps = await db.query(
       'reservations',
-      where: 'id: ?',
+      where: 'id = ?',
       whereArgs: [idReservation],
     );
     if (maps.isEmpty) {
       return Reservation(
           idReservation: -1,
           idUsuario: -1,
-          idModulo: -1,
-          reservationType: 'none',
+          idModuloE: -1,
+          idModuloS: -1,
+          reservationType: -1,
+          idLab: -1,
           idComputer: -1);
     }
     return Reservation.fromMap(maps[0]);

@@ -45,12 +45,14 @@ class ActionButtonSized extends StatelessWidget {
       required this.function,
       required this.width,
       required this.height,
-      required this.fontSize});
+      required this.fontSize,
+      required this.isEnable});
   final String contenidoBoton;
   final void Function() function;
   final double width;
   final double height;
   final double fontSize;
+  final bool isEnable;
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -63,7 +65,9 @@ class ActionButtonSized extends StatelessWidget {
             height: height,
             width: width,
             decoration: BoxDecoration(
-              color: GlobalColors.mainColor,
+              color: isEnable
+                  ? GlobalColors.mainColor
+                  : const Color.fromARGB(255, 204, 204, 204),
               borderRadius: BorderRadius.circular(6),
               boxShadow: [
                 BoxShadow(

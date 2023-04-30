@@ -198,8 +198,14 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                                       primary: GlobalColors.mainColor,
                                     ),
                               ),
-                              child: const DropdownMenuAlter(
-                                listOfItems: ['Laboratorio 1', 'Laboratorio 2'],
+                              child: DropdownMenuAlter(
+                                listOfItems: const [
+                                  'Laboratorio 1',
+                                  'Laboratorio 2'
+                                ],
+                                selectedItem: 1,
+                                refreshData: () {},
+                                returnValue: (p0) {},
                               )),
                         )
                       ],
@@ -217,13 +223,13 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                   child: ListView.builder(
                       itemCount: reservations.length,
                       prototypeItem: ReservationView(
-                          type: int.parse(reservations.first.reservationType),
+                          type: reservations.first.reservationType,
                           startHour: "7:00",
                           finalHour: "8:30",
                           lab: reservations.first.idReservation),
                       shrinkWrap: true,
                       itemBuilder: (context, index) => ReservationView(
-                          type: int.parse(reservations[index].reservationType),
+                          type: reservations[index].reservationType,
                           startHour: "7:00",
                           finalHour: "8:30",
                           lab: reservations[index].idReservation)),
@@ -235,6 +241,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ActionButtonSized(
+                      isEnable: true,
                       contenidoBoton: 'Hacer reservación',
                       function: () => Get.to(() => const BookingView()),
                       width: 150,

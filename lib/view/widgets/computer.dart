@@ -5,16 +5,28 @@ import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 
 class ComputerInput extends StatefulWidget {
-  const ComputerInput(
-      {super.key, required this.computerNumber, required this.isNotEnabled});
+  const ComputerInput({
+    super.key,
+    required this.computerNumber,
+    required this.isNotEnabled,
+    required this.selectedReturnValue,
+    required this.initialState,
+  });
+  final bool initialState;
   final int computerNumber;
   final bool isNotEnabled;
+  final Function(bool) selectedReturnValue;
   @override
   State<ComputerInput> createState() => _ComputerInputState();
 }
 
 class _ComputerInputState extends State<ComputerInput> {
-  bool isSelected = false;
+  late bool isSelected;
+  @override
+  void initState() {
+    isSelected = widget.initialState;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,10 +38,14 @@ class _ComputerInputState extends State<ComputerInput> {
             padding: EdgeInsets.zero,
             onPressed: widget.isNotEnabled
                 ? null
-                : () => setState(() {
+                : () {
+                    setState(() {
                       isSelected = !isSelected;
-                    }),
+                    });
+                    widget.selectedReturnValue(isSelected);
+                  },
             alignment: Alignment.center,
+            disabledColor: const Color.fromARGB(255, 204, 204, 204),
             child: const Icon(CupertinoIcons.desktopcomputer),
           ),
         ),
@@ -70,6 +86,7 @@ class _ComputerInputNoFunctionState extends State<ComputerInputNoFunction> {
                     ? GlobalColors.mainColor
                     : Colors.black,
             padding: EdgeInsets.zero,
+            disabledColor: const Color.fromARGB(255, 204, 204, 204),
             onPressed: widget.color == 3 ? null : () {},
             alignment: Alignment.center,
             child: const Icon(
