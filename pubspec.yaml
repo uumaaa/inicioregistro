@@ -36,6 +36,7 @@ dependencies:
   get: ^4.6.5
   hexcolor: ^2.0.7
   flutter_svg:
+  mysql1: ^0.20.0
   grouped_buttons:
   file_picker:
   path_provider:

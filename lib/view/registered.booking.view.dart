@@ -216,6 +216,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                   height: 10,
                 ),
                 Container(
+                  height: 450,
                   decoration:
                       BoxDecoration(border: Border.all(color: Colors.black)),
                   margin: const EdgeInsets.all(10),
@@ -235,7 +236,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                           lab: reservations[index].idReservation)),
                 ),
                 const SizedBox(
-                  height: 200,
+                  height: 5,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,

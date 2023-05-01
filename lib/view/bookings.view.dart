@@ -551,6 +551,7 @@ class _BookingViewState extends State<BookingView> {
                                     reservation);
                               }
                               Get.to(() => const LoginView());
+                              dispose();
                             }
                           : () {},
                       width: 150,
