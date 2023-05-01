@@ -30,6 +30,7 @@ class _BookingViewState extends State<BookingView> {
   late Future futureModulesComputers;
   late bool allComputers;
   late List<int> selectedComputers;
+  late List<Computer> computers;
   @override
   void initState() {
     currentDate = DateTime(now.year, now.month, now.day);
@@ -38,6 +39,7 @@ class _BookingViewState extends State<BookingView> {
     selectedEndHour = 1;
     selectedInHour = 1;
     selectedComputers = [];
+    computers = [];
     _controllerDate.text =
         '${currentDate.year}-${currentDate.month}-${currentDate.day}';
     selectedDate = DateTime(now.year, now.month, now.day);
@@ -54,7 +56,6 @@ class _BookingViewState extends State<BookingView> {
 
   void refreshData() {
     setState(() {
-      selectedComputers = [];
       futureComputers = Future.wait(
         [
           DatabaseHelper.getComputersBetweenModules(selectedInHour,
@@ -335,38 +336,34 @@ class _BookingViewState extends State<BookingView> {
                   future: futureComputers,
                   builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                     if (snapshot.hasData) {
-                      List<Computer> computers = snapshot.data![1];
+                      computers = snapshot.data![1];
                       return Container(
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.black)),
                         margin: const EdgeInsets.all(10),
                         padding: const EdgeInsets.fromLTRB(10, 10, 10, 0),
-                        child: StatefulBuilder(
-                          builder: (context, setState) {
-                            return GridView.builder(
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 8,
-                                      childAspectRatio: 1.3,
-                                      crossAxisSpacing: 5,
-                                      mainAxisExtent: 75),
-                              itemCount: computers.length,
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) => ComputerInput(
-                                  selectedReturnValue: (p0) {
-                                    if (selectedComputers.contains(p0)) {
-                                      selectedComputers.remove(p0);
-                                    } else {
-                                      selectedComputers.add(p0);
-                                    }
-                                  },
-                                  computerNumber:
-                                      computers[index].idComputer + 1,
-                                  isNotEnabled: snapshot.data![0]
-                                      .contains(computers[index])),
-                            );
-                          },
-                        ),
+                        child: GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 8,
+                                    childAspectRatio: 1.3,
+                                    crossAxisSpacing: 5,
+                                    mainAxisExtent: 75),
+                            itemCount: computers.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) => ComputerInput(
+                                key: UniqueKey(),
+                                initState: allComputers,
+                                selectedReturnValue: (p0) {
+                                  if (selectedComputers.contains(p0 - 1)) {
+                                    selectedComputers.remove(p0 - 1);
+                                  } else {
+                                    selectedComputers.add(p0 - 1);
+                                  }
+                                },
+                                computerNumber: computers[index].idComputer + 1,
+                                isNotEnabled: snapshot.data![0]
+                                    .contains(computers[index]))),
                       );
                     } else {
                       return const SizedBox(
@@ -379,13 +376,22 @@ class _BookingViewState extends State<BookingView> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Checkbox(
-                        value: allComputers,
-                        onChanged: (item) {
-                          setState(() {
+                      value: allComputers,
+                      onChanged: (item) {
+                        setState(
+                          () {
+                            selectedComputers.clear();
                             allComputers = item!;
-                          });
-                          refreshData();
-                        }),
+                            if (allComputers) {
+                              for (var computer in computers) {
+                                selectedComputers.add(computer.idComputer);
+                              }
+                            }
+                          },
+                        );
+                        refreshData();
+                      },
+                    ),
                     const SizedBox(
                       width: 10,
                     ),

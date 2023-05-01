@@ -1,7 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 
 class ComputerInput extends StatefulWidget {
@@ -10,8 +8,10 @@ class ComputerInput extends StatefulWidget {
     required this.computerNumber,
     required this.isNotEnabled,
     required this.selectedReturnValue,
+    required this.initState,
   });
   final int computerNumber;
+  final bool initState;
   final bool isNotEnabled;
   final Function(int) selectedReturnValue;
   @override
@@ -19,7 +19,18 @@ class ComputerInput extends StatefulWidget {
 }
 
 class _ComputerInputState extends State<ComputerInput> {
-  bool isSelected = false;
+  late bool isSelected;
+  @override
+  void initState() {
+    isSelected = widget.initState;
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(

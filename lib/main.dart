@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/extras/database.classes.dart';
 import 'package:inicioregistro/view/splash.view.dart';
-import 'package:inicioregistro/view/registered.booking.view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,7 +12,6 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return const GetMaterialApp(
