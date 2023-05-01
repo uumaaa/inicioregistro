@@ -1,14 +1,19 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
 import 'package:inicioregistro/extras/database.classes.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
+import 'package:inicioregistro/view/register.view.dart';
 
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/widgets/computer.dart';
 import 'package:inicioregistro/view/widgets/drop.down.menu.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:sqflite/sqflite.dart';
+
+import 'login.view.dart';
 
 class BookingView extends StatefulWidget {
   const BookingView({super.key});
@@ -31,11 +36,13 @@ class _BookingViewState extends State<BookingView> {
   late bool allComputers;
   late List<int> selectedComputers;
   late List<Computer> computers;
+  late List<Computer> disabledComputers;
   @override
   void initState() {
     currentDate = DateTime(now.year, now.month, now.day);
     allComputers = false;
     selectedLab = 1;
+    disabledComputers = [];
     selectedEndHour = 1;
     selectedInHour = 1;
     selectedComputers = [];
@@ -52,6 +59,23 @@ class _BookingViewState extends State<BookingView> {
       ],
     );
     super.initState();
+  }
+
+  void refresDataChangeLab() {
+    setState(() {
+      selectedComputers = [];
+      allComputers = false;
+      futureComputers = Future.wait(
+        [
+          DatabaseHelper.getComputersBetweenModules(selectedInHour,
+              selectedEndHour, _controllerDate.text, selectedLab),
+          DatabaseHelper.computers(selectedLab),
+        ],
+      );
+      var splitDate = _controllerDate.text.split("-");
+      selectedDate = DateTime(int.parse(splitDate[0]), int.parse(splitDate[1]),
+          int.parse(splitDate[2]));
+    });
   }
 
   void refreshData() {
@@ -241,7 +265,7 @@ class _BookingViewState extends State<BookingView> {
                                 'Laboratorio 2'
                               ],
                               selectedItem: selectedLab,
-                              refreshData: refreshData,
+                              refreshData: refresDataChangeLab,
                               returnValue: ((p0) {
                                 selectedLab = p0;
                               }),
@@ -332,11 +356,36 @@ class _BookingViewState extends State<BookingView> {
                 const SizedBox(
                   height: 5,
                 ),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Selecciona tu computadora',
+                      style: TextStyle(
+                          color: GlobalColors.mainColor,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
                 FutureBuilder(
                   future: futureComputers,
                   builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                     if (snapshot.hasData) {
                       computers = snapshot.data![1];
+                      disabledComputers = snapshot.data![0];
+                      if (allComputers) {
+                        for (var computer in computers) {
+                          if (!disabledComputers.contains(computer) &&
+                              !selectedComputers
+                                  .contains(computer.idComputer)) {
+                            selectedComputers.add(computer.idComputer);
+                          }
+                          if (disabledComputers.contains(computer)) {
+                            selectedComputers.remove(computer.idComputer);
+                          }
+                        }
+                      }
                       return Container(
                         decoration: BoxDecoration(
                             border: Border.all(color: Colors.black)),
@@ -353,16 +402,29 @@ class _BookingViewState extends State<BookingView> {
                             shrinkWrap: true,
                             itemBuilder: (context, index) => ComputerInput(
                                 key: UniqueKey(),
-                                initState: allComputers,
+                                initState: selectedComputers
+                                    .contains(computers[index].idComputer),
                                 selectedReturnValue: (p0) {
                                   if (selectedComputers.contains(p0 - 1)) {
+                                    setState(() {
+                                      if (allComputers) {
+                                        allComputers = !allComputers;
+                                      }
+                                    });
                                     selectedComputers.remove(p0 - 1);
                                   } else {
                                     selectedComputers.add(p0 - 1);
+                                    setState(() {
+                                      if (selectedComputers.length ==
+                                          (computers.length -
+                                              disabledComputers.length)) {
+                                        allComputers = true;
+                                      }
+                                    });
                                   }
                                 },
                                 computerNumber: computers[index].idComputer + 1,
-                                isNotEnabled: snapshot.data![0]
+                                isNotEnabled: disabledComputers
                                     .contains(computers[index]))),
                       );
                     } else {
@@ -375,25 +437,46 @@ class _BookingViewState extends State<BookingView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    Checkbox(
-                      value: allComputers,
-                      onChanged: (item) {
-                        setState(
-                          () {
-                            selectedComputers.clear();
-                            allComputers = item!;
-                            if (allComputers) {
-                              for (var computer in computers) {
-                                selectedComputers.add(computer.idComputer);
+                    Container(
+                      width: 15,
+                      height: 15,
+                      child: Checkbox(
+                        value: allComputers,
+                        onChanged: (item) {
+                          setState(
+                            () {
+                              selectedComputers.clear();
+                              allComputers = item!;
+                              if (allComputers) {
+                                for (var computer in computers) {
+                                  if (!disabledComputers.contains(computer) &&
+                                      !selectedComputers
+                                          .contains(computer.idComputer)) {
+                                    selectedComputers.add(computer.idComputer);
+                                  }
+                                  if (disabledComputers.contains(computer)) {
+                                    selectedComputers
+                                        .remove(computer.idComputer);
+                                  }
+                                }
                               }
-                            }
-                          },
-                        );
-                        refreshData();
-                      },
+                            },
+                          );
+                        },
+                      ),
                     ),
                     const SizedBox(
                       width: 10,
+                    ),
+                    const Text(
+                      'Seleccionar todas',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 60,
                     ),
                     const ComputerInputNoFunction(
                         color: 1, text: "Seleccionada(s)"),
@@ -419,12 +502,57 @@ class _BookingViewState extends State<BookingView> {
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     ActionButtonSized(
-                      isEnable: !(selectedDate.isBefore(currentDate) ||
-                          selectedDate.isAtSameMomentAs(now)),
+                      key: UniqueKey(),
+                      isEnable: !((selectedDate.isBefore(currentDate) ||
+                              selectedDate.isAtSameMomentAs(now))) &&
+                          selectedComputers.isNotEmpty,
                       contenidoBoton: 'Confirmar reservación',
-                      function: () {
-                        print(selectedComputers);
-                      },
+                      function: selectedComputers.isNotEmpty
+                          ? () async {
+                              if (_controllerDate.text.isEmpty ||
+                                  selectedEndHour.isNaN ||
+                                  selectedInHour.isNaN ||
+                                  selectedLab.isNaN ||
+                                  selectedComputers.isEmpty) {
+                                return;
+                              }
+                              final List<Reservation> reservations =
+                                  await DatabaseHelper.reservations();
+                              int numberOfReservations = reservations.length;
+                              List<Reservation> reservationToInsert = [];
+                              if (allComputers) {
+                                final Reservation currentReservation =
+                                    Reservation(
+                                        idReservation: numberOfReservations + 1,
+                                        idUsuario: id,
+                                        idModuloE: selectedEndHour,
+                                        idModuloS: selectedInHour,
+                                        idLab: selectedLab,
+                                        reservationType: 2,
+                                        idComputer: 0,
+                                        date: _controllerDate.text);
+                                reservationToInsert.add(currentReservation);
+                              } else {
+                                for (var computer in selectedComputers) {
+                                  Reservation currentReservation = Reservation(
+                                      idReservation: numberOfReservations++,
+                                      idUsuario: id,
+                                      idModuloE: selectedEndHour,
+                                      idModuloS: selectedInHour,
+                                      idLab: selectedLab,
+                                      reservationType: 1,
+                                      idComputer: computer,
+                                      date: _controllerDate.text);
+                                  reservationToInsert.add(currentReservation);
+                                }
+                              }
+                              for (var reservation in reservationToInsert) {
+                                await DatabaseHelper.insertReservation(
+                                    reservation);
+                              }
+                              Get.to(() => const LoginView());
+                            }
+                          : () {},
                       width: 150,
                       height: 35,
                       fontSize: 12,

@@ -98,6 +98,9 @@ class _ComputerInputNoFunctionState extends State<ComputerInputNoFunction> {
             ),
           ),
         ),
+        const SizedBox(
+          height: 4,
+        ),
         Text(
           widget.text,
           style: const TextStyle(

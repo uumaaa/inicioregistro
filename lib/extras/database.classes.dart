@@ -128,7 +128,7 @@ class Reservation {
   late final int idLab;
   late final int reservationType;
   late final int idComputer;
-
+  late final String date;
   Reservation({
     required this.idReservation,
     required this.idUsuario,
@@ -137,6 +137,7 @@ class Reservation {
     required this.idLab,
     required this.reservationType,
     required this.idComputer,
+    required this.date,
   });
 
   Reservation.fromMap(Map<String, dynamic> map) {
@@ -147,6 +148,7 @@ class Reservation {
     idLab = map['idLab'];
     reservationType = map['reservationType'];
     idComputer = map['idComputer'];
+    date = map['date'];
   }
 
   Map<String, dynamic> toMap() {
@@ -158,12 +160,13 @@ class Reservation {
       'idLab': idLab,
       'reservationType': reservationType,
       'idComputer': idComputer,
+      'date': date,
     };
   }
 
   @override
   String toString() {
-    return 'Reservation{idReservation: $idReservation, idUsuario: $idUsuario, idModuloS: $idModuloS, idModuloE: $idModuloE, idLab: $idLab reservationType: $reservationType, idComputadora: $idComputer}';
+    return 'Reservation{idReservation: $idReservation, idUsuario: $idUsuario, idModuloS: $idModuloS, idModuloE: $idModuloE, idLab: $idLab reservationType: $reservationType, idComputadora: $idComputer, date: $date}';
   }
 }
 
@@ -448,7 +451,8 @@ class DatabaseHelper {
           reservationType: maps[i]['reservationType'],
           idComputer: maps[i]['idComputer'],
           idModuloS: maps[i]['idModuloS'],
-          idLab: maps[i]['idLab']);
+          idLab: maps[i]['idLab'],
+          date: maps[i]['date']);
     });
   }
 
@@ -481,6 +485,7 @@ class DatabaseHelper {
             reservationType: maps[i]['reservationType'],
             idComputer: maps[i]['idComputer'],
             idModuloS: maps[i]['idModuloS'],
+            date: maps[i]['date'],
             idLab: maps[i]['idLab']));
     List<Computer> computersUsed = [];
     List<Computer> allComputers = await computers(lab);
@@ -531,6 +536,7 @@ class DatabaseHelper {
           idModuloS: -1,
           reservationType: -1,
           idLab: -1,
+          date: '',
           idComputer: -1);
     }
     return Reservation.fromMap(maps[0]);
