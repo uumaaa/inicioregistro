@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:inicioregistro/extras/database.classes.dart';
+import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
@@ -105,12 +105,6 @@ class LoginView extends StatelessWidget {
                 final matricula = controladorMatricula.value.text;
                 final contrasena = controladorContrasena.value.text;
                 if (matricula.isEmpty || contrasena.isEmpty) {
-                  return;
-                }
-
-                final posibleUser = await DatabaseHelper.getUser(
-                    int.parse(matricula), contrasena);
-                if (posibleUser.id == -1) {
                   return;
                 }
               },

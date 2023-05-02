@@ -2,18 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:inicioregistro/extras/database.classes.dart';
+import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
-import 'package:inicioregistro/view/register.view.dart';
 
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/widgets/computer.dart';
 import 'package:inicioregistro/view/widgets/drop.down.menu.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
-import 'package:sqflite/sqflite.dart';
-
-import 'login.view.dart';
+import 'package:inicioregistro/extras/http.database.dart';
 
 class BookingView extends StatefulWidget {
   const BookingView({super.key});
@@ -50,12 +47,12 @@ class _BookingViewState extends State<BookingView> {
     _controllerDate.text =
         '${currentDate.year}-${currentDate.month}-${currentDate.day}';
     selectedDate = DateTime(now.year, now.month, now.day);
-    futureModulesComputers = DatabaseHelper.modules();
+    futureModulesComputers = Http().modules();
     futureComputers = Future.wait(
       [
-        DatabaseHelper.getComputersBetweenModules(
+        Http().getComputersBetweenModules(
             selectedInHour, selectedEndHour, _controllerDate.text, selectedLab),
-        DatabaseHelper.computers(selectedLab),
+        Http().computers(selectedLab),
       ],
     );
     super.initState();
@@ -67,9 +64,9 @@ class _BookingViewState extends State<BookingView> {
       allComputers = false;
       futureComputers = Future.wait(
         [
-          DatabaseHelper.getComputersBetweenModules(selectedInHour,
-              selectedEndHour, _controllerDate.text, selectedLab),
-          DatabaseHelper.computers(selectedLab),
+          Http().getComputersBetweenModules(selectedInHour, selectedEndHour,
+              _controllerDate.text, selectedLab),
+          Http().computers(selectedLab),
         ],
       );
       var splitDate = _controllerDate.text.split("-");
@@ -82,9 +79,9 @@ class _BookingViewState extends State<BookingView> {
     setState(() {
       futureComputers = Future.wait(
         [
-          DatabaseHelper.getComputersBetweenModules(selectedInHour,
-              selectedEndHour, _controllerDate.text, selectedLab),
-          DatabaseHelper.computers(selectedLab),
+          Http().getComputersBetweenModules(selectedInHour, selectedEndHour,
+              _controllerDate.text, selectedLab),
+          Http().computers(selectedLab),
         ],
       );
       var splitDate = _controllerDate.text.split("-");
@@ -509,6 +506,16 @@ class _BookingViewState extends State<BookingView> {
                       contenidoBoton: 'Confirmar reservación',
                       function: selectedComputers.isNotEmpty
                           ? () async {
+                              var response = await Http()
+                                  .getComputersBetweenModules(
+                                      selectedInHour,
+                                      selectedEndHour,
+                                      _controllerDate.text,
+                                      selectedLab);
+                              if (response == null) {
+                                return;
+                              }
+                              print(response);
                               if (_controllerDate.text.isEmpty ||
                                   selectedEndHour.isNaN ||
                                   selectedInHour.isNaN ||
@@ -517,7 +524,7 @@ class _BookingViewState extends State<BookingView> {
                                 return;
                               }
                               final List<Reservation> reservations =
-                                  await DatabaseHelper.reservations();
+                                  await Http().reservations();
                               int numberOfReservations = reservations.length;
                               List<Reservation> reservationToInsert = [];
                               if (allComputers) {
@@ -547,11 +554,10 @@ class _BookingViewState extends State<BookingView> {
                                 }
                               }
                               for (var reservation in reservationToInsert) {
-                                await DatabaseHelper.insertReservation(
-                                    reservation);
+                                await Http().insertReservation(reservation);
                               }
-                              Get.to(() => const LoginView());
-                              dispose();
+                              //Get.to(() => const LoginView());
+                              //dispose();
                             }
                           : () {},
                       width: 150,

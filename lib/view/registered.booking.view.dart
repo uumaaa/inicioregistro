@@ -2,15 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:inicioregistro/extras/database.classes.dart';
+import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/bookings.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
-import 'package:inicioregistro/view/widgets/computer.dart';
 import 'package:inicioregistro/view/widgets/drop.down.menu.dart';
 import 'package:inicioregistro/view/widgets/reservation.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:inicioregistro/extras/http.database.dart';
 
 class RegisteredBooking extends StatefulWidget {
   const RegisteredBooking({super.key});
@@ -33,8 +33,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
     List<String> finalHours = [];
     List<Reservation> reservations;
     return FutureBuilder(
-      future: Future.wait(
-          [DatabaseHelper.modules(), DatabaseHelper.reservations()]),
+      future: Future.wait([Http().modules(), Http().reservations()]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           modules = snapshot.data == null ? [] : snapshot.data![0];

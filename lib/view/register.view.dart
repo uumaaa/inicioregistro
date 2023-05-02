@@ -6,7 +6,6 @@ import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
-import '../extras/database.classes.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RegisterView extends StatefulWidget {
@@ -206,12 +205,6 @@ class _RegisterViewState extends State<RegisterView>
                       tipo.isEmpty) {
                     return;
                   }
-                  final user = User(
-                      id: int.parse(matricula),
-                      name: nombre,
-                      password: contrasena,
-                      type: int.parse(tipo));
-                  await DatabaseHelper.insertUser(user);
                 },
               ),
               const SizedBox(height: 20),
