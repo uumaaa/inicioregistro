@@ -93,6 +93,7 @@ class Http {
   }
 
   Future<void> insertReservation(Reservation reservation) async {
+    print('$url$reservationAPI');
     Uri uri = Uri.parse('$url$reservationAPI');
     String body = json.encode(reservation.toJson());
     http.Response response = await http.post(
@@ -101,6 +102,7 @@ class Http {
       body: body,
       encoding: encoding,
     );
+    print(response.statusCode);
     return;
   }
 
@@ -228,7 +230,7 @@ class Http {
   Future<List<Computer>> getComputersBetweenModules(
       int startModule, int endModule, String date, int lab) async {
     Uri uri = Uri.parse(
-        '$url$reservationAPI?startModule=$startModule&endModule=$endModule&date=$date&lab=$lab');
+        '$url$reservationAPI?startModule=$startModule&endModule=$endModule&reservationDate=$date&lab=$lab');
     http.Response response = await http.get(uri);
     List<Reservation> reservations = reservationFromJson(response.body);
     List<Computer> computersUsed = [];
@@ -243,6 +245,69 @@ class Http {
       }
     }
     return computersUsed;
-    return [];
+  }
+
+  Future<int> numberOfReservations() async {
+    Uri uri = Uri.parse('$url$reservationAPI');
+    http.Response response = await http.get(uri);
+    return reservationFromJson(
+      response.body,
+    ).length;
+  }
+
+  Future<List<Reservation>> reservationsFromDateAndLab(
+      String date, int lab) async {
+    Uri uri = Uri.parse('$url$reservationAPI?reservationDate=$date&lab=$lab');
+    http.Response response = await http.get(uri);
+    return reservationFromJson(
+      response.body,
+    );
+  }
+
+  Future<Map<int, int>> obtainDiferentReservations(String date, int lab) async {
+    Map<int, int> diferentReservationsMap = {};
+    List<Reservation> reservations =
+        await reservationsFromDateAndLab(date, lab);
+    List<int> contador = [];
+    List<Reservation> diferentReservations = [];
+    for (Reservation reservation in reservations) {
+      if (!diferentReservations.contains(reservation)) {
+        diferentReservations.add(reservation);
+        contador.add(1);
+      } else {
+        contador[diferentReservations.indexOf(reservation)]++;
+      }
+    }
+    for (var i = 0; i < diferentReservations.length; i++) {
+      diferentReservationsMap[i] = contador[i];
+    }
+    return diferentReservationsMap;
+  }
+
+  Future<List<Reservation>> obtainDiferentList(String date, int lab) async {
+    Map<Reservation, int> diferentReservationsMap = {
+      Reservation(
+          idReservation: 1,
+          idUsuario: 1,
+          idModuloS: 1,
+          idModuloE: 1,
+          idLab: 1,
+          reservationType: 1,
+          reservationDate: 'reservationDate',
+          idComputer: 1): 2
+    };
+    List<Reservation> reservations =
+        await reservationsFromDateAndLab(date, lab);
+    List<int> contador = [];
+    List<Reservation> diferentReservations = [];
+    for (Reservation reservation in reservations) {
+      if (!diferentReservations.contains(reservation)) {
+        diferentReservations.add(reservation);
+        contador.add(1);
+      } else {
+        contador[diferentReservations.indexOf(reservation)]++;
+      }
+    }
+    return diferentReservations;
   }
 }

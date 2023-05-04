@@ -3,6 +3,8 @@
 //     final computer = computerFromJson(jsonString);
 
 import 'dart:convert';
+import 'package:flutter/material.dart';
+
 import 'BO/BO.dart';
 
 List<Computer> computerFromJson(String str) =>
@@ -19,6 +21,11 @@ class Computer {
     required this.idComputer,
     required this.idLaboratorio,
   });
+  @override
+  int get hashCode => Object.hash(idComputer, idLaboratorio);
+  @override
+  bool operator ==(Object other) =>
+      other is Computer && other.idComputer == idComputer;
 
   factory Computer.fromJson(Map<String, dynamic> json) => Computer(
         idComputer: json["idComputer"],
@@ -123,13 +130,13 @@ String reservationToJson(List<Reservation> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class Reservation {
-  late final int idReservation;
+  late int idReservation;
   late final int idUsuario;
   late final int idModuloS;
   late final int idModuloE;
   late final int idLab;
   late final int reservationType;
-  late final String date;
+  late final String reservationDate;
   late final int idComputer;
 
   Reservation({
@@ -139,9 +146,21 @@ class Reservation {
     required this.idModuloE,
     required this.idLab,
     required this.reservationType,
-    required this.date,
+    required this.reservationDate,
     required this.idComputer,
   });
+  @override
+  bool operator ==(Object other) =>
+      other is Reservation &&
+      other.idUsuario == idUsuario &&
+      other.idLab == idLab &&
+      other.idModuloE == idModuloE &&
+      other.idModuloS == idModuloS &&
+      other.reservationDate == reservationDate &&
+      other.reservationType == reservationType;
+  @override
+  int get hashCode => Object.hash(
+      idUsuario, idLab, idModuloE, idModuloS, reservationDate, reservationType);
 
   factory Reservation.fromJson(Map<String, dynamic> json) => Reservation(
         idReservation: json["idReservation"],
@@ -150,7 +169,7 @@ class Reservation {
         idModuloE: json["idModuloE"],
         idLab: json["idLab"],
         reservationType: json["reservationType"],
-        date: json["date"],
+        reservationDate: json["reservationDate"],
         idComputer: json["idComputer"],
       );
 
@@ -161,7 +180,7 @@ class Reservation {
         "idModuloE": idModuloE,
         "idLab": idLab,
         "reservationType": reservationType,
-        "date": date,
+        "reservationDate": reservationDate,
         "idComputer": idComputer,
       };
 }

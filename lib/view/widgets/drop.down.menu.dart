@@ -7,11 +7,13 @@ class DropdownMenuAlter extends StatefulWidget {
       required this.listOfItems,
       required this.returnValue,
       required this.refreshData,
-      required this.selectedItem});
+      required this.selectedItem,
+      required this.firstIndex});
   final int selectedItem;
   final List<String> listOfItems;
   final Function refreshData;
   final Function(int) returnValue;
+  final int firstIndex;
 
   @override
   State<DropdownMenuAlter> createState() => _DropdownMenuAlterState();
@@ -23,9 +25,14 @@ class _DropdownMenuAlterState extends State<DropdownMenuAlter> {
   @override
   void initState() {
     super.initState();
-    selectedItemMenu = widget.listOfItems[widget.selectedItem - 1];
-    widget.returnValue(widget.selectedItem);
-    for (var i = 0; i < widget.listOfItems.length; i++) {
+    if ((widget.selectedItem) <= widget.firstIndex) {
+      selectedItemMenu = widget.listOfItems[widget.firstIndex];
+      widget.returnValue(widget.firstIndex + 1);
+    } else {
+      selectedItemMenu = widget.listOfItems[widget.selectedItem - 1];
+      widget.returnValue(widget.selectedItem);
+    }
+    for (var i = widget.firstIndex; i < widget.listOfItems.length; i++) {
       items.add(
         DropdownMenuItem(
           value: widget.listOfItems[i],

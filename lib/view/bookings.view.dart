@@ -4,7 +4,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
-
+import 'package:inicioregistro/view/registered.booking.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/widgets/computer.dart';
@@ -34,14 +34,18 @@ class _BookingViewState extends State<BookingView> {
   late List<int> selectedComputers;
   late List<Computer> computers;
   late List<Computer> disabledComputers;
+  late int firstEndModuleIndex;
+  late int user;
   @override
   void initState() {
+    user = 202244;
     currentDate = DateTime(now.year, now.month, now.day);
     allComputers = false;
     selectedLab = 1;
     disabledComputers = [];
     selectedEndHour = 1;
     selectedInHour = 1;
+    firstEndModuleIndex = 0;
     selectedComputers = [];
     computers = [];
     _controllerDate.text =
@@ -58,7 +62,7 @@ class _BookingViewState extends State<BookingView> {
     super.initState();
   }
 
-  void refresDataChangeLab() {
+  void refreshData() {
     setState(() {
       selectedComputers = [];
       allComputers = false;
@@ -72,21 +76,7 @@ class _BookingViewState extends State<BookingView> {
       var splitDate = _controllerDate.text.split("-");
       selectedDate = DateTime(int.parse(splitDate[0]), int.parse(splitDate[1]),
           int.parse(splitDate[2]));
-    });
-  }
-
-  void refreshData() {
-    setState(() {
-      futureComputers = Future.wait(
-        [
-          Http().getComputersBetweenModules(selectedInHour, selectedEndHour,
-              _controllerDate.text, selectedLab),
-          Http().computers(selectedLab),
-        ],
-      );
-      var splitDate = _controllerDate.text.split("-");
-      selectedDate = DateTime(int.parse(splitDate[0]), int.parse(splitDate[1]),
-          int.parse(splitDate[2]));
+      firstEndModuleIndex = selectedInHour - 1;
     });
   }
 
@@ -181,6 +171,8 @@ class _BookingViewState extends State<BookingView> {
                             height: 50,
                             width: 150,
                             child: TextField(
+                              keyboardType: TextInputType.none,
+                              readOnly: true,
                               textAlign: TextAlign.center,
                               cursorColor: GlobalColors.colorSombreado,
                               style: const TextStyle(
@@ -261,8 +253,9 @@ class _BookingViewState extends State<BookingView> {
                                 'Laboratorio 1',
                                 'Laboratorio 2'
                               ],
+                              firstIndex: 0,
                               selectedItem: selectedLab,
-                              refreshData: refresDataChangeLab,
+                              refreshData: refreshData,
                               returnValue: ((p0) {
                                 selectedLab = p0;
                               }),
@@ -303,6 +296,7 @@ class _BookingViewState extends State<BookingView> {
                             child: DropdownMenuAlter(
                               selectedItem: selectedInHour,
                               listOfItems: startHours,
+                              firstIndex: 0,
                               refreshData: refreshData,
                               returnValue: ((p0) {
                                 selectedInHour = p0;
@@ -334,8 +328,10 @@ class _BookingViewState extends State<BookingView> {
                                   ),
                             ),
                             child: DropdownMenuAlter(
+                              key: UniqueKey(),
                               listOfItems: finalHours,
                               selectedItem: selectedEndHour,
+                              firstIndex: firstEndModuleIndex,
                               refreshData: refreshData,
                               returnValue: ((p0) {
                                 selectedEndHour = p0;
@@ -371,6 +367,10 @@ class _BookingViewState extends State<BookingView> {
                     if (snapshot.hasData) {
                       computers = snapshot.data![1];
                       disabledComputers = snapshot.data![0];
+                      if (computers.length == disabledComputers.length) {
+                        selectedComputers.clear();
+                        allComputers = false;
+                      }
                       if (allComputers) {
                         for (var computer in computers) {
                           if (!disabledComputers.contains(computer) &&
@@ -403,12 +403,12 @@ class _BookingViewState extends State<BookingView> {
                                     .contains(computers[index].idComputer),
                                 selectedReturnValue: (p0) {
                                   if (selectedComputers.contains(p0 - 1)) {
+                                    selectedComputers.remove(p0 - 1);
                                     setState(() {
                                       if (allComputers) {
                                         allComputers = !allComputers;
                                       }
                                     });
-                                    selectedComputers.remove(p0 - 1);
                                   } else {
                                     selectedComputers.add(p0 - 1);
                                     setState(() {
@@ -442,8 +442,11 @@ class _BookingViewState extends State<BookingView> {
                         onChanged: (item) {
                           setState(
                             () {
-                              selectedComputers.clear();
-                              allComputers = item!;
+                              if (!(computers.length ==
+                                  disabledComputers.length)) {
+                                selectedComputers.clear();
+                                allComputers = item!;
+                              }
                               if (allComputers) {
                                 for (var computer in computers) {
                                   if (!disabledComputers.contains(computer) &&
@@ -496,26 +499,21 @@ class _BookingViewState extends State<BookingView> {
                   height: 15,
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     ActionButtonSized(
+                        contenidoBoton: 'Regresar',
+                        function: () => Get.to(() => const RegisteredBooking()),
+                        width: 150,
+                        height: 35,
+                        fontSize: 12,
+                        isEnable: true),
+                    ActionButtonSized(
                       key: UniqueKey(),
-                      isEnable: !((selectedDate.isBefore(currentDate) ||
-                              selectedDate.isAtSameMomentAs(now))) &&
-                          selectedComputers.isNotEmpty,
+                      isEnable: selectedComputers.isNotEmpty,
                       contenidoBoton: 'Confirmar reservación',
                       function: selectedComputers.isNotEmpty
                           ? () async {
-                              var response = await Http()
-                                  .getComputersBetweenModules(
-                                      selectedInHour,
-                                      selectedEndHour,
-                                      _controllerDate.text,
-                                      selectedLab);
-                              if (response == null) {
-                                return;
-                              }
-                              print(response);
                               if (_controllerDate.text.isEmpty ||
                                   selectedEndHour.isNaN ||
                                   selectedInHour.isNaN ||
@@ -523,49 +521,28 @@ class _BookingViewState extends State<BookingView> {
                                   selectedComputers.isEmpty) {
                                 return;
                               }
-                              final List<Reservation> reservations =
-                                  await Http().reservations();
-                              int numberOfReservations = reservations.length;
-                              List<Reservation> reservationToInsert = [];
-                              if (allComputers) {
-                                final Reservation currentReservation =
-                                    Reservation(
-                                        idReservation: numberOfReservations + 1,
-                                        idUsuario: id,
-                                        idModuloE: selectedEndHour,
-                                        idModuloS: selectedInHour,
-                                        idLab: selectedLab,
-                                        reservationType: 2,
-                                        idComputer: 0,
-                                        date: _controllerDate.text);
-                                reservationToInsert.add(currentReservation);
-                              } else {
-                                for (var computer in selectedComputers) {
-                                  Reservation currentReservation = Reservation(
-                                      idReservation: numberOfReservations++,
-                                      idUsuario: id,
-                                      idModuloE: selectedEndHour,
-                                      idModuloS: selectedInHour,
-                                      idLab: selectedLab,
-                                      reservationType: 1,
-                                      idComputer: computer,
-                                      date: _controllerDate.text);
-                                  reservationToInsert.add(currentReservation);
-                                }
-                              }
-                              for (var reservation in reservationToInsert) {
+                              int numberOfReservations =
+                                  await Http().numberOfReservations();
+                              int cont = numberOfReservations + 1;
+                              for (int specificComputer in selectedComputers) {
+                                Reservation reservation = Reservation(
+                                    idReservation: cont,
+                                    idUsuario: user,
+                                    idModuloS: selectedInHour,
+                                    idModuloE: selectedEndHour,
+                                    idLab: selectedLab,
+                                    reservationType: allComputers ? 2 : 1,
+                                    reservationDate: _controllerDate.text,
+                                    idComputer: specificComputer);
                                 await Http().insertReservation(reservation);
+                                cont++;
                               }
-                              //Get.to(() => const LoginView());
-                              //dispose();
+                              Get.to(() => const RegisteredBooking());
                             }
                           : () {},
                       width: 150,
                       height: 35,
                       fontSize: 12,
-                    ),
-                    const SizedBox(
-                      width: 20,
                     ),
                   ],
                 ),

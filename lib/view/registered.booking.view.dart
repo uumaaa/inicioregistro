@@ -21,29 +21,60 @@ class RegisteredBooking extends StatefulWidget {
 
 class _RegisteredBookingState extends State<RegisteredBooking> {
   final TextEditingController _controllerDate = TextEditingController();
-  late String selectedLab;
-  late String selectedInHour;
-  late String selectedEndHour;
+  late int selectedLab;
+  late DateTime now = DateTime.now();
+  late DateTime currentDate;
+  late DateTime selectedDate;
+  late List<Module> modules;
+  late List<Reservation> reservations;
+  late int user;
+  late Future<List<Module>> futureModules;
+  late Future<List<Reservation>> reservationsSelected;
+  late Future<Map<int, int>> reservationFromMaps;
+  List<String> startHours = [];
+  List<String> finalHours = [];
+  @override
+  void initState() {
+    user = 202244;
+    selectedLab = 1;
+    currentDate = DateTime(now.year, now.month, now.day);
+    _controllerDate.text =
+        '${currentDate.year}-${currentDate.month}-${currentDate.day}';
+    selectedDate = DateTime(now.year, now.month, now.day);
+    futureModules = Http().modules();
+    reservationsSelected =
+        Http().obtainDiferentList(_controllerDate.text, selectedLab);
+    reservationFromMaps =
+        Http().obtainDiferentReservations(_controllerDate.text, selectedLab);
+    super.initState();
+  }
+
+  void refreshData() {
+    setState(() {
+      reservationsSelected =
+          Http().reservationsFromDateAndLab(_controllerDate.text, selectedLab);
+      reservationFromMaps =
+          Http().obtainDiferentReservations(_controllerDate.text, selectedLab);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    DateTime now = DateTime.now();
-    DateTime currentDate = DateTime(now.year, now.month, now.day);
-    List<Module> modules;
-    List<String> startHours = [];
-    List<String> finalHours = [];
-    List<Reservation> reservations;
     return FutureBuilder(
-      future: Future.wait([Http().modules(), Http().reservations()]),
+      future: Future.wait(
+          [futureModules, reservationsSelected, reservationFromMaps]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           modules = snapshot.data == null ? [] : snapshot.data![0];
           reservations = snapshot.data == null ? [] : snapshot.data![1];
+          Map<int, int> count = snapshot.data == null ? [] : snapshot.data![2];
+
           for (var module in modules) {
             startHours.add(module.startHour);
             finalHours.add(module.finalHour);
           }
-          return registeredbookingObs(
-              context, currentDate, startHours, finalHours, reservations);
+          return registeredbookingObs(context, currentDate, startHours,
+              finalHours, reservations, count);
         } else {
           return Scaffold(
             backgroundColor: GlobalColors.mainColor,
@@ -64,7 +95,8 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
       DateTime currentDate,
       List<String> startHours,
       List<String> finalHours,
-      List<Reservation> reservations) {
+      List<Reservation> reservations,
+      Map<int, int> count) {
     return KeyboardDismisser(
       gestures: const [
         GestureType.onTap,
@@ -140,6 +172,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                                     color: GlobalColors.colorSombreado),
                               ),
                               controller: _controllerDate,
+                              readOnly: true,
                               onTap: () async {
                                 DateTime? pickdate = await showDatePicker(
                                   context: context,
@@ -169,6 +202,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                                 } else {
                                   _controllerDate.text =
                                       '${pickdate.year}-${pickdate.month}-${pickdate.day}';
+                                  refreshData();
                                 }
                               },
                             ),
@@ -202,9 +236,12 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                                   'Laboratorio 1',
                                   'Laboratorio 2'
                                 ],
-                                selectedItem: 1,
-                                refreshData: () {},
-                                returnValue: (p0) {},
+                                firstIndex: 0,
+                                selectedItem: selectedLab,
+                                refreshData: refreshData,
+                                returnValue: (p0) {
+                                  selectedLab = p0;
+                                },
                               )),
                         )
                       ],
@@ -216,23 +253,26 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                 ),
                 Container(
                   height: 450,
-                  decoration:
-                      BoxDecoration(border: Border.all(color: Colors.black)),
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-                  child: ListView.builder(
-                      itemCount: reservations.length,
-                      prototypeItem: ReservationView(
-                          type: reservations.first.reservationType,
-                          startHour: "7:00",
-                          finalHour: "8:30",
-                          lab: reservations.first.idReservation),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => ReservationView(
-                          type: reservations[index].reservationType,
-                          startHour: "7:00",
-                          finalHour: "8:30",
-                          lab: reservations[index].idReservation)),
+                  margin: const EdgeInsets.all(15),
+                  child: reservations.isNotEmpty
+                      ? ListView.builder(
+                          itemCount: reservations.length,
+                          prototypeItem: ReservationView(
+                              seats: 1,
+                              type: reservations.first.reservationType,
+                              startHour: '',
+                              finalHour: '',
+                              number: reservations.first.idReservation),
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) => ReservationView(
+                              seats: (count[index]) ?? 30,
+                              type: reservations[index].reservationType,
+                              startHour:
+                                  startHours[(reservations[index].idModuloS)],
+                              finalHour:
+                                  finalHours[(reservations[index].idModuloE)],
+                              number: index + 1))
+                      : Container(child: Text("No hay reservaciones")),
                 ),
                 const SizedBox(
                   height: 5,
