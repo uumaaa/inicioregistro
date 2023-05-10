@@ -3,7 +3,8 @@
 //     final computer = computerFromJson(jsonString);
 
 import 'dart:convert';
-import 'package:flutter/material.dart';
+
+import 'package:encrypt/encrypt.dart';
 
 import 'BO/BO.dart';
 
@@ -96,31 +97,55 @@ String userToJson(List<User> data) =>
     json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class User {
-  late final int id;
+  late final String id;
   late final String name;
-  late final String password;
   late final int type;
+  late final String hash;
+  late final String randomString;
 
   User({
     required this.id,
     required this.name,
-    required this.password,
     required this.type,
+    required this.randomString,
+    required this.hash,
   });
 
   factory User.fromJson(Map<String, dynamic> json) => User(
-        id: json["id"],
-        name: json["name"],
-        password: json["password"],
-        type: json["type"],
-      );
+      id: json["id"],
+      name: json["name"],
+      type: json["type"],
+      hash: json["hash"],
+      randomString: json["randomString"]);
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "name": name,
-        "password": password,
         "type": type,
+        "hash": hash,
+        "randomString": randomString
       };
+  static Encrypter getEncrypter(String id, String name, int type) {
+    Encrypter encrypter = Encrypter(Salsa20(Key.fromUtf8('$id$name$type')));
+    return encrypter;
+  }
+
+  static Encrypted getHash(
+      String id, String name, int type, String password, String randomString) {
+    Encrypter encrypter = getEncrypter(id, name, type);
+    Encrypted hash = encrypter.encrypt(password, iv: IV.fromUtf8(randomString));
+    return hash;
+  }
+
+  bool verifyPassword(String newpassword) {
+    Encrypter encrypter = getEncrypter(id, name, type);
+    Encrypted newhash =
+        encrypter.encrypt(newpassword, iv: IV.fromUtf8(randomString));
+    if (newhash.base64 == hash) {
+      return true;
+    }
+    return false;
+  }
 }
 
 List<Reservation> reservationFromJson(String str) => List<Reservation>.from(
@@ -149,6 +174,13 @@ class Reservation {
     required this.reservationDate,
     required this.idComputer,
   });
+  static int compare(Reservation a, Reservation b) {
+    if (a.idModuloS == b.idModuloS) return 0;
+    if (a.idModuloS < b.idModuloS) return -1;
+    if (a.idModuloS > b.idModuloS) return 1;
+    return -1;
+  }
+
   @override
   bool operator ==(Object other) =>
       other is Reservation &&

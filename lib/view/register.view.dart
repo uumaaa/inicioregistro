@@ -1,11 +1,15 @@
+import 'package:encrypt/encrypt.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:inicioregistro/extras/http.database.dart';
+import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/login.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+import 'package:random_string/random_string.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class RegisterView extends StatefulWidget {
@@ -18,41 +22,34 @@ class RegisterView extends StatefulWidget {
 class _RegisterViewState extends State<RegisterView>
     with SingleTickerProviderStateMixin {
   bool isChecked = false;
+  final TextEditingController controladorMatricula = TextEditingController();
+  final TextEditingController controladorContrasena = TextEditingController();
+  final TextEditingController controladorNombre = TextEditingController();
+  final TextEditingController controladorTipo = TextEditingController();
+  Color getColor(Set<MaterialState> states) {
+    const Set<MaterialState> interactiveStates = <MaterialState>{
+      MaterialState.pressed,
+      MaterialState.hovered,
+      MaterialState.focused,
+    };
+    if (states.any(interactiveStates.contains)) {
+      return GlobalColors.mainColor;
+    }
+    return GlobalColors.mainColor;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final TextEditingController controladorMatricula = TextEditingController();
-    final TextEditingController controladorContrasena = TextEditingController();
-    final TextEditingController controladorNombre = TextEditingController();
-    final TextEditingController controladorTipo = TextEditingController();
-    Color getColor(Set<MaterialState> states) {
-      const Set<MaterialState> interactiveStates = <MaterialState>{
-        MaterialState.pressed,
-        MaterialState.hovered,
-        MaterialState.focused,
-      };
-      if (states.any(interactiveStates.contains)) {
-        return GlobalColors.mainColor;
-      }
-      return GlobalColors.mainColor;
-    }
-
     return KeyboardDismisser(
       gestures: const [
         GestureType.onTap,
         GestureType.onVerticalDragDown,
       ],
-      child: registerPrincipal(controladorMatricula, controladorNombre,
-          controladorContrasena, controladorTipo, getColor),
+      child: registerPrincipal(),
     );
   }
 
-  Scaffold registerPrincipal(
-      TextEditingController controladorMatricula,
-      TextEditingController controladorNombre,
-      TextEditingController controladorContrasena,
-      TextEditingController controladorTipo,
-      Color getColor(Set<MaterialState> states)) {
+  Scaffold registerPrincipal() {
     return Scaffold(
       appBar: AppBar(backgroundColor: GlobalColors.mainColor),
       drawer: const SideBarMenuView(),
@@ -202,9 +199,30 @@ class _RegisterViewState extends State<RegisterView>
                   if (matricula.isEmpty ||
                       contrasena.isEmpty ||
                       nombre.isEmpty ||
-                      tipo.isEmpty) {
+                      tipo.isEmpty ||
+                      !tipo.isNumericOnly ||
+                      !matricula.isNumericOnly ||
+                      contrasena.length < 10 ||
+                      int.parse(tipo) < 1 ||
+                      int.parse(tipo) > 2) {
                     return;
                   }
+                  String random_string = randomString(8);
+                  Encrypted possibleEncrypted = User.getHash(matricula, nombre,
+                      int.parse(tipo), contrasena, random_string);
+                  String hash = possibleEncrypted.base64;
+                  User possibleUser = User(
+                      id: matricula,
+                      name: nombre,
+                      type: int.parse(tipo),
+                      randomString: random_string,
+                      hash: hash);
+                  List<User> response = await Http().getUser(matricula);
+                  if (response.isNotEmpty) {
+                    return;
+                  }
+                  await Http().insertUser(possibleUser);
+                  Get.to(() => const LoginView());
                 },
               ),
               const SizedBox(height: 20),

@@ -66,6 +66,10 @@ class _BookingViewState extends State<BookingView> {
     setState(() {
       selectedComputers = [];
       allComputers = false;
+      firstEndModuleIndex = selectedInHour - 1;
+      if (selectedInHour > selectedEndHour) {
+        selectedEndHour = selectedInHour;
+      }
       futureComputers = Future.wait(
         [
           Http().getComputersBetweenModules(selectedInHour, selectedEndHour,
@@ -76,7 +80,6 @@ class _BookingViewState extends State<BookingView> {
       var splitDate = _controllerDate.text.split("-");
       selectedDate = DateTime(int.parse(splitDate[0]), int.parse(splitDate[1]),
           int.parse(splitDate[2]));
-      firstEndModuleIndex = selectedInHour - 1;
     });
   }
 

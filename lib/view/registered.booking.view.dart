@@ -31,6 +31,9 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
   late Future<List<Module>> futureModules;
   late Future<List<Reservation>> reservationsSelected;
   late Future<Map<int, int>> reservationFromMaps;
+  late Future<List<Computer>> computersFuture;
+  late Map<int, int> count;
+  late List<Computer> computers;
   List<String> startHours = [];
   List<String> finalHours = [];
   @override
@@ -46,35 +49,41 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
         Http().obtainDiferentList(_controllerDate.text, selectedLab);
     reservationFromMaps =
         Http().obtainDiferentReservations(_controllerDate.text, selectedLab);
+    computersFuture = Http().computers(selectedLab);
     super.initState();
   }
 
   void refreshData() {
     setState(() {
       reservationsSelected =
-          Http().reservationsFromDateAndLab(_controllerDate.text, selectedLab);
+          Http().obtainDiferentList(_controllerDate.text, selectedLab);
       reservationFromMaps =
           Http().obtainDiferentReservations(_controllerDate.text, selectedLab);
+      computersFuture = Http().computers(selectedLab);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait(
-          [futureModules, reservationsSelected, reservationFromMaps]),
+      future: Future.wait([
+        futureModules,
+        reservationsSelected,
+        reservationFromMaps,
+        computersFuture
+      ]),
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           modules = snapshot.data == null ? [] : snapshot.data![0];
           reservations = snapshot.data == null ? [] : snapshot.data![1];
-          Map<int, int> count = snapshot.data == null ? [] : snapshot.data![2];
-
+          count = snapshot.data == null ? [] : snapshot.data![2];
+          computers = snapshot.data == null ? [] : snapshot.data![3];
           for (var module in modules) {
             startHours.add(module.startHour);
             finalHours.add(module.finalHour);
           }
           return registeredbookingObs(context, currentDate, startHours,
-              finalHours, reservations, count);
+              finalHours, reservations, count, computers);
         } else {
           return Scaffold(
             backgroundColor: GlobalColors.mainColor,
@@ -96,7 +105,8 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
       List<String> startHours,
       List<String> finalHours,
       List<Reservation> reservations,
-      Map<int, int> count) {
+      Map<int, int> count,
+      List<Computer> computers) {
     return KeyboardDismisser(
       gestures: const [
         GestureType.onTap,
@@ -265,7 +275,7 @@ class _RegisteredBookingState extends State<RegisteredBooking> {
                               number: reservations.first.idReservation),
                           shrinkWrap: true,
                           itemBuilder: (context, index) => ReservationView(
-                              seats: (count[index]) ?? 30,
+                              seats: (computers.length - (count[index] ?? 0)),
                               type: reservations[index].reservationType,
                               startHour:
                                   startHours[(reservations[index].idModuloS)],

@@ -1,11 +1,12 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 
 import '../extras/http.database.dart';
 
 class Http {
-  final url = 'http://10.0.2.2:8000/';
+  final url =
+      Platform.isAndroid ? 'http://10.0.2.2:8000/' : 'http:/localhost:8000';
   final computerAPI = 'computers/';
   final labAPI = 'labs/';
   final moduleAPI = 'modules/';
@@ -107,6 +108,7 @@ class Http {
   }
 
   Future<void> insertUser(User user) async {
+    print("entre");
     Uri uri = Uri.parse('$url$userAPI');
     String body = json.encode(user.toJson());
     http.Response response = await http.post(
@@ -268,6 +270,7 @@ class Http {
     Map<int, int> diferentReservationsMap = {};
     List<Reservation> reservations =
         await reservationsFromDateAndLab(date, lab);
+    reservations.sort((a, b) => Reservation.compare(a, b));
     List<int> contador = [];
     List<Reservation> diferentReservations = [];
     for (Reservation reservation in reservations) {
@@ -298,6 +301,7 @@ class Http {
     };
     List<Reservation> reservations =
         await reservationsFromDateAndLab(date, lab);
+    reservations.sort((a, b) => Reservation.compare(a, b));
     List<int> contador = [];
     List<Reservation> diferentReservations = [];
     for (Reservation reservation in reservations) {
@@ -309,5 +313,13 @@ class Http {
       }
     }
     return diferentReservations;
+  }
+
+  Future<List<User>> getUser(String matricula) async {
+    Uri uri = Uri.parse('$url$userAPI$matricula');
+    http.Response response = await http.get(uri);
+    return userFromJson(
+      response.body,
+    );
   }
 }

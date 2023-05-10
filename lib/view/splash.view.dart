@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
 import 'package:inicioregistro/view/bookings.view.dart';
+import 'package:inicioregistro/view/login.view.dart';
+import 'package:inicioregistro/view/register.view.dart';
 import 'package:inicioregistro/view/registered.booking.view.dart';
 
 class SplashView extends StatelessWidget {

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:inicioregistro/services/remote.services.dart';
 import 'package:inicioregistro/utils/global.colors.dart';
+import 'package:inicioregistro/view/bookings.view.dart';
+import 'package:inicioregistro/view/registered.booking.view.dart';
 import 'package:inicioregistro/view/side.menu.dart';
 import 'package:inicioregistro/view/widgets/text.form.global.dart';
 import 'package:inicioregistro/view/widgets/button.global.dart';
 import 'package:inicioregistro/view/register.view.dart';
 import 'package:keyboard_dismisser/keyboard_dismisser.dart';
+
+import '../extras/http.database.dart';
 
 class LoginView extends StatelessWidget {
   const LoginView({super.key});
@@ -104,8 +108,20 @@ class LoginView extends StatelessWidget {
               function: () async {
                 final matricula = controladorMatricula.value.text;
                 final contrasena = controladorContrasena.value.text;
-                if (matricula.isEmpty || contrasena.isEmpty) {
+                if (matricula.isEmpty ||
+                    contrasena.isEmpty ||
+                    !matricula.isNumericOnly ||
+                    matricula.length != 10 ||
+                    contrasena.length < 10) {
                   return;
+                }
+                List<User> response = await Http().getUser(matricula);
+                if (response.isEmpty) {
+                  return;
+                }
+                User registeredUser = response.first;
+                if (registeredUser.verifyPassword(contrasena)) {
+                  Get.to(() => const RegisteredBooking());
                 }
               },
             ),

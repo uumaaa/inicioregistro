@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:flutter_svg_provider/flutter_svg_provider.dart';
 
 import '../../utils/global.colors.dart';
 
@@ -22,19 +21,25 @@ class ReservationView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                  color: type == 1
-                      ? const Color.fromARGB(152, 1, 101, 251)
-                      : GlobalColors.mainColor,
-                  spreadRadius: 1,
-                  blurRadius: 5,
-                  offset: Offset(0, 0))
-            ],
-            borderRadius: BorderRadius.all(Radius.circular(20)),
-            color: type == 1
-                ? const Color.fromARGB(255, 1, 100, 251)
-                : GlobalColors.mainColor),
+          boxShadow: [
+            BoxShadow(
+                color: type == 1
+                    ? Color.fromARGB(151, 0, 137, 158)
+                    : GlobalColors.mainColor,
+                spreadRadius: 1,
+                blurRadius: 5,
+                offset: const Offset(0, 0))
+          ],
+          borderRadius: const BorderRadius.all(Radius.circular(20)),
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: Svg(
+              type == 1
+                  ? 'assets/images/disponible.svg'
+                  : 'assets/images/reservada.svg',
+            ),
+          ),
+        ),
         margin: const EdgeInsets.fromLTRB(4, 10, 4, 0),
         padding: const EdgeInsets.all(5),
         child: Row(
@@ -106,7 +111,7 @@ class ReservationView extends StatelessWidget {
                               fontWeight: FontWeight.w500),
                         )
                       : Text(
-                          '${30 - seats} asiento(s) libre(s)',
+                          '${seats} asiento(s) libre(s)',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                               color: Colors.white,
